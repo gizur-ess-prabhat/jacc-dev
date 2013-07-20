@@ -26,6 +26,8 @@ var argv    = require('optimist')
                 .usage('Usage: ./app.js --cmd [push|status|help]')
                 .demand(['cmd'])
                 .argv;
+var fs      = require('fs');
+var request = require('request');
 
 var redis_client = require("redis").createClient();
 
@@ -42,8 +44,6 @@ redis_client.on("error", function (err) {
 // Globals
 //==============
 
-var sep    = ';';
-var oauthToken;
 
 
 // Functions
@@ -60,9 +60,13 @@ function build(){
 
     helpers.logDebug('build: Start...');
 
-    var fs = require('fs');
-    var request = require('request');
-    fs.createReadStream('webapp.tar').pipe(request.post('http://localhost:4243/'));
+//    fs.createReadStream('webapp.tar').pipe(request.post('http://localhost:4243/'));
+    fs.createReadStream('webapp.tar').pipe(
+        request.post(
+            'http://localhost:4243/', 
+            function (error, response, body) {helpers.logDebug(body);}
+        )
+    );
 
     helpers.logDebug('build: data sent...');        
 }
