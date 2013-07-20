@@ -56,4 +56,7 @@ Troubleshooting
 hipache is configured through a redis database. Make sure that redis is running (assuming 
 it already is installed): `sudo service redis-server status`
 
+When using vagrant, run the bootstrap.sh script manually after the machine has been created.
+The kernel upgrade stops the execution of the script so the rest need to be executed once
+more.
 

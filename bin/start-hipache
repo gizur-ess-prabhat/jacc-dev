@@ -1,2 +1,3 @@
 #!/bin/bash
-hipache --config ../config.json
+ABSOLUTE_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/`basename "${BASH_SOURCE[0]}"`
+hipache --config $ABSOLUTE_PATH/../config.json
