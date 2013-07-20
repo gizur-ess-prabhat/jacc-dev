@@ -63,7 +63,7 @@ function build(){
 //    fs.createReadStream('webapp.tar').pipe(request.post('http://localhost:4243/'));
     fs.createReadStream('webapp.tar').pipe(
         request.post(
-            'http://localhost:4243/', 
+            'http://localhost:4243/build', 
             function (error, response, body) {helpers.logDebug(body);}
         )
     );
