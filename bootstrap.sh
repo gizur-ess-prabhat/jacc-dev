@@ -33,16 +33,17 @@ sudo apt-get install -y lxc-docker
 
 
 #
-# Install docker registry
+# Install local docker registry
 #
 
-echo DOCKER_INDEX_URL="http://0.0.0.0:5000/" >> ~/.profile
+# Currently not used
+#echo DOCKER_INDEX_URL="http://0.0.0.0:5000/" >> ~/.profile
 
-git clone https://github.com/dotcloud/docker-registry.git
-cd docker-registry && cp config_sample.yml config.yml
-pip install -r requirements.txt
-./wsgi.py &
-cd ..
+#git clone https://github.com/dotcloud/docker-registry.git
+#cd docker-registry && cp config_sample.yml config.yml
+#pip install -r requirements.txt
+#./wsgi.py &
+#cd ..
 
 
 #
@@ -64,10 +65,3 @@ sudo npm install grunt grunt-cli -g
 #
 
 sudo apt-get install -y redis-server
-
-
-#
-# Clone repo, usefull in case the automatic mount don't work
-#
-
-git clone https://github.com/colmsjo/docker.git

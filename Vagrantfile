@@ -1,26 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Multi VM example
 #
-# See http://docs-v1.vagrantup.com/v1/docs/multivm.html
+# Start VM with docker installed
 #
-# Vagrant::Config.run do |config|
-#   config.vm.define :web do |web_config|
-#     web_config.vm.box = "web"
-#     web_config.vm.forward_port 80, 8080
-#   end
-#
-#   config.vm.define :db do |db_config|
-#     db_config.vm.box = "db"
-#     db_config.vm.forward_port 3306, 3306
-#   end
-# end
-#
-# vagrant up web
-# vagrant ssh
-
-
 
 
 Vagrant.configure("2") do |config|
@@ -60,12 +43,6 @@ Vagrant.configure("2") do |config|
   config.vm.define :vb do |vb_config|
     vb_config.vm.box = "precise64"
     vb_config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-    vb_config.vm.network :forwarded_port, guest: 49150, host: 49150
-    vb_config.vm.network :forwarded_port, guest: 49151, host: 49151
-    vb_config.vm.network :forwarded_port, guest: 49152, host: 49152
-    vb_config.vm.network :forwarded_port, guest: 49153, host: 49153
-    vb_config.vm.network :forwarded_port, guest: 49154, host: 49154
-    vb_config.vm.network :forwarded_port, guest: 49155, host: 49155
     vb_config.vm.provision :shell, :path => "bootstrap.sh"
   end
 
