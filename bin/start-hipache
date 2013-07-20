@@ -1,0 +1,2 @@
+#!/bin/bash
+hipache --config ../config.json
