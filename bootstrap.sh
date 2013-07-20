@@ -65,3 +65,10 @@ sudo npm install grunt grunt-cli -g
 #
 
 sudo apt-get install -y redis-server
+
+
+#
+# Clone this repo
+#
+
+git clone https://github.com/colmsjo/jacc.git
