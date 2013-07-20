@@ -30,7 +30,7 @@ var argv    = require('optimist')
 var redis_client = require("redis").createClient();
 
 // set logging level
-helpers.logging_threshold  = helpers.logging.warning;
+helpers.logging_threshold  = helpers.logging.debug;
 
 // redis error management
 redis_client.on("error", function (err) {
