@@ -71,5 +71,6 @@ sudo apt-get install -y redis-server
 # Clone this repo and run the installation
 #
 
+cd ~
 git clone https://github.com/colmsjo/jacc.git
 cd jacc && sudo npm install

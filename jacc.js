@@ -27,7 +27,7 @@ var argv    = require('optimist')
                 .demand(['cmd'])
                 .argv;
 var fs      = require('fs');
-var request = require('request');
+//var request = require('request');
 
 var redis_client = require("redis").createClient();
 
@@ -60,13 +60,33 @@ function build(){
 
     helpers.logDebug('build: Start...');
 
-//    fs.createReadStream('webapp.tar').pipe(request.post('http://localhost:4243/'));
-    fs.createReadStream('webapp.tar').pipe(
-        request.post(
-            'http://localhost:4243/build', 
-            function (error, response, body) {helpers.logDebug(body);}
-        )
-    );
+    var http = require('http');
+
+    var options = {
+      hostname: 'localhost',
+      port: 4243,
+      path: '/build',
+      method: 'POST'
+    };
+
+    var req = http.request(options, function(res) {
+      helpers.logDebug('STATUS: ' + res.statusCode);
+      helpers.logDebug('HEADERS: ' + JSON.stringify(res.headers));
+
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        helpers.logDebug('BODY: ' + chunk);
+      });
+
+    });
+
+    req.on('error', function(e) {
+      helpers.logErr('problem with request: ' + e.message);
+    });
+
+    // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+    var fs = require('fs');
+    fs.createReadStream('webapp.tar').pipe(req);
 
     helpers.logDebug('build: data sent...');        
 }
