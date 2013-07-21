@@ -47,4 +47,13 @@ Vagrant.configure("2") do |config|
     vb_config.vm.provision :shell, :path => "bootstrap2.sh"
   end
 
+
+ #
+ # Had problems with the nameserver, this helped
+ #
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+  end
+
 end
