@@ -84,6 +84,10 @@ function build(){
       helpers.logErr('problem with request: ' + e.message);
     });
 
+    req.on('end', function(e) {
+      helpers.logDebug('RECEIVED END, SHOULD EXIT: ' + e.message);
+    });
+
     // write data to the http.ClientRequest (which is a stream) returned by http.request() 
     var fs = require('fs');
     fs.createReadStream('webapp.tar').pipe(req);
