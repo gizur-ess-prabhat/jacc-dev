@@ -10,21 +10,13 @@ sudo apt-get install -y git unzip s3cmd curl
 
 
 #
-# Install NodeJs
-#
-
-sudo apt-get update -y
-sudo apt-get install -y python g++ make software-properties-common
-sudo add-apt-repository -y ppa:chris-lea/node.js
-sudo apt-get update -y
-sudo apt-get install -y nodejs
-
-
-#
 # Install docker.io
 #
 
+# Kernel upgrade
 sudo apt-get install -y linux-image-generic-lts-raring
+sudo reboot
+
 
 sudo apt-get install -y python-software-properties software-properties-common python-pip python-dev libevent-dev
 sudo add-apt-repository ppa:dotcloud/lxc-docker
@@ -44,6 +36,18 @@ sudo apt-get install -y lxc-docker
 #pip install -r requirements.txt
 #./wsgi.py &
 #cd ..
+
+
+#
+# Install NodeJs
+#
+
+sudo apt-get update -y
+sudo apt-get -y dist-upgrade
+sudo apt-get install -y python g++ make software-properties-common
+sudo add-apt-repository -y ppa:chris-lea/node.js
+sudo apt-get update -y
+sudo apt-get install -y nodejs
 
 
 #
