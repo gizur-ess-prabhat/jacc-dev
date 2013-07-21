@@ -15,7 +15,9 @@ Pre-requisites:
  * AWS account to launch a server in Amazons cloud 
 
 The repo comes with a Vagrantfile. Installation of a test/development environment is done running
-`vagrant up vb`. 
+`vagrant up vb` followed by `vagrant reload vb`. Reloading is needed since a kernel upgrade is 
+performed.
+ 
 
 
 It should also be possible to run `bootstrap.sh` this in any Ubuntu machine.

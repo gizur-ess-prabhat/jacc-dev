@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
 
     aws_config.vm.box = "dummy"
     aws_config.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-    aws_config.vm.provision :shell, :path => "bootstrap.sh"
+    aws_config.vm.provision :shell, :path => "bootstrap-ec2.sh"
 
   end
 
@@ -44,6 +44,7 @@ Vagrant.configure("2") do |config|
     vb_config.vm.box = "precise64"
     vb_config.vm.box_url = "http://files.vagrantup.com/precise64.box"
     vb_config.vm.provision :shell, :path => "bootstrap.sh"
+    vb_config.vm.provision :shell, :path => "bootstrap2.sh"
   end
 
 end

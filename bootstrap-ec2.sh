@@ -21,5 +21,5 @@ sudo reboot
 # The rest is the same as outside ec2
 #
 
-source ./bootstrap.sh
+source ./bootstrap2.sh
 
