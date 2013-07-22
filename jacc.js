@@ -14,6 +14,15 @@
 //------------------------------
 
 
+// start the new container
+// curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
+
+// Get the logs of the started container (should show the current date since that's all the container does)
+// curl -H "Content-Type: application/vnd.docker.raw-stream" -d '' "http://localhost:4243/containers/c6bfd6da99d3/attach?logs=1&stream=0&stdout=1"
+
+// Inspect the container
+// curl -G http://localhost:4243/containers/c6bfd6da99d3/json
+
 
 (function(){
 
@@ -27,9 +36,8 @@ var argv    = require('optimist')
                 .demand(['cmd'])
                 .argv;
 var fs      = require('fs');
-//var request = require('request');
-
 var redis_client = require("redis").createClient();
+var http = require('http');
 
 // set logging level
 helpers.logging_threshold  = helpers.logging.debug;
@@ -44,7 +52,8 @@ redis_client.on("error", function (err) {
 // Globals
 //==============
 
-
+var hostname = "localhost",
+    port = 4243;
 
 // Functions
 //==============
@@ -60,72 +69,105 @@ function build(){
 
     helpers.logDebug('build: Start...');
 
-    var http = require('http');
-
     var options = {
-      hostname: 'localhost',
-      port: 4243,
+      hostname: hostname,
+      port: port,
       path: '/build',
       method: 'POST'
     };
 
     var req = http.request(options, function(res) {
-      helpers.logDebug('STATUS: ' + res.statusCode);
-      helpers.logDebug('HEADERS: ' + JSON.stringify(res.headers));
+      helpers.logDebug('build: STATUS: ' + res.statusCode);
+      helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
 
       res.setEncoding('utf8');
       res.on('data', function (chunk) {
-        helpers.logDebug('BODY: ' + chunk);
+        helpers.logDebug('build: BODY: ' + chunk);
       });
 
     });
 
     req.on('error', function(e) {
-      helpers.logErr('problem with request: ' + e.message);
+      helpers.logErr('build: problem with request: ' + e.message);
     });
 
     req.on('end', function(e) {
-      helpers.logDebug('RECEIVED END, SHOULD EXIT: ' + e.message);
+      helpers.logDebug('build: RECIEVED END, SHOULD EXIT: ' + e.message);
     });
 
     // write data to the http.ClientRequest (which is a stream) returned by http.request() 
     var fs = require('fs');
     fs.createReadStream('webapp.tar').pipe(req);
 
-    helpers.logDebug('build: data sent...');        
+    helpers.logDebug('build: Data sent...');        
 }
 
-// test
+
+// createContainer
 //-------------------------------------------------------------------------------------------------
 //
-// example on howot use jQuery.ajax
-//
+// create a container with the new image
+// curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
+// {"Id":"c6bfd6da99d3"}
 
-function test(){
+function createContainer(){
 
-   var request = $.ajax({
+   var container = {
+     "Hostname":"",
+     "User":"",
+     "Memory":0,
+     "MemorySwap":0,
+     "AttachStdin":false,
+     "AttachStdout":true,
+     "AttachStderr":true,
+     "PortSpecs":null,
+     "Tty":false,
+     "OpenStdin":false,
+     "StdinOnce":false,
+     "Env":null,
+     "Cmd":[
+             "date"
+     ],
+     "Dns":null,
+     "Image":"e29f1e430a8e",
+     "Volumes":{},
+     "VolumesFrom":""
+    };
 
-        url: 'http://localhost:4243/build',
-        type: 'POST',
-        contentType: 'application/tar',
+    var options = {
+      hostname: hostname,
+      port: port,
+      path: '/containers/create',
+      method: 'POST'
+    };
 
-        data: '{ "scopes": [ "repo" ], "note": "Created by list-issues.js"  }',
+    helpers.logDebug('createContainer: Start...');
 
+    var req = http.request(options, function(res) {
+      helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
+      helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
 
-        success: function(data){
-            helpers.logDebug('build: Yea, it worked...' + JSON.stringify(data) );
-            oauthToken = data;
-        },
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        helpers.logDebug('createContainer: BODY: ' + chunk);
+      });
 
-        error: function(data){
-            helpers.logErr('build: Shit hit the fan...' + JSON.stringify(data));
-
-        }
     });
 
-    return request;
-}
+    req.on('error', function(e) {
+      helpers.logErr('createContainer: problem with request: ' + e.message);
+    });
 
+    req.on('end', function(e) {
+      helpers.logDebug('createContainer: RECIEVED END, SHOULD EXIT: ' + e.message);
+    });
+
+    // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+    var fs = require('fs');
+    fs.createReadStream('webapp.tar').pipe(req);
+
+    helpers.logDebug('createContainer: Data sent...');        
+}
 
 // main
 //-------------------------------------------------------------------------------------------------
@@ -134,7 +176,7 @@ function test(){
 switch (argv.cmd) {
 
     case "push":
-        helpers.logDebug('main: running build...');
+        helpers.logDebug('push: running build...');
         build();
         break;
 
