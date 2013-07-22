@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo coffee nameserver.coffee
+sudo sh -c 'coffee nameserver.coffee > /var/log/nameserver.log 2>&1 &'
