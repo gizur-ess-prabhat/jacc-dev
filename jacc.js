@@ -36,14 +36,14 @@ var argv    = require('optimist')
                 .demand(['cmd'])
                 .argv;
 var fs      = require('fs');
-var redis_client = require("redis").createClient();
-var http = require('http');
+var redis   = require("redis").createClient();
+var http    = require('http');
 
 // set logging level
 helpers.logging_threshold  = helpers.logging.debug;
 
 // redis error management
-redis_client.on("error", function (err) {
+redis.on("error", function (err) {
     helpers.logErr("Error " + err);
 });
 
@@ -110,7 +110,7 @@ function build(){
 // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
 // {"Id":"c6bfd6da99d3"}
 
-function createContainer(){
+function createContainer(image){
 
    var container = {
      "Hostname":"",
@@ -129,7 +129,7 @@ function createContainer(){
              "date"
      ],
      "Dns":null,
-     "Image":"e29f1e430a8e",
+     "Image":image,
      "Volumes":{},
      "VolumesFrom":""
     };
