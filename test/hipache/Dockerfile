@@ -18,6 +18,9 @@ RUN     rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-
 # Install Node.js and npm
 RUN     yum install -y npm-1.2.17-5.el6
 
+# Install redis-server
+RUN	yum install -y redis-server
+
 # Bundle app source
 ADD . /src
 
