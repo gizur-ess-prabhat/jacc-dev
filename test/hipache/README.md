@@ -31,7 +31,20 @@ redis-cli rpush frontend:www.dotcloud.com mywebsite
 redis-cli rpush frontend:www.dotcloud.com http://172.16.42.3:8080
 ```
 
-Try to access the site (hipache is running on port 8080):
+View the configuration:
+
+```
+redis-cli lrange frontend:www.dotcloud.com 0 -1
+```
+
+Make sure the destination app works:
+
+```
+>http://172.16.42.3:8080
+Hello World
+```
+
+Try to access the app (hipache is running on port 8080):
 
 ```
 >curl www.dotcloud.com:8080
@@ -40,5 +53,5 @@ Try to access the site (hipache is running on port 8080):
 
 ## Test hipache when outside the host
 
-
+Coming Soon
 
