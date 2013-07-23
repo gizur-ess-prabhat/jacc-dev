@@ -1,7 +1,7 @@
 {
     "server": {
         "accessLog": "./var/log/hipache_access.log",
-        "port": 80,
+        "port": 8080,
         "workers": 5,
         "maxSockets": 100,
         "deadBackendTTL": 30,
