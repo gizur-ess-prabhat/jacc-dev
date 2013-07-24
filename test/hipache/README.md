@@ -26,6 +26,14 @@ ID                  IMAGE               COMMAND              CREATED            
 
 Configure hipache:
 
+Remove old configuration:
+
+```
+redis-cli del frontend:www.dotcloud.com
+```
+
+Add configuration:
+
 ```
 redis-cli rpush frontend:www.dotcloud.com mywebsite
 redis-cli rpush frontend:www.dotcloud.com http://172.16.42.3:8080
