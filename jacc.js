@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// mycloud.js
+// jacc.js
 //------------------------------
 //
 // 2013-07-19, Jonas Colmsjö
@@ -26,240 +26,245 @@
 
 (function(){
 
-// Includes
-// ================
+    // Includes
+    // ================
 
-var $       = require('jQuery');
-var helpers = require('./lib/js/helpers.js').create();
-var argv    = require('optimist')
-                .usage('Usage: ./app.js --cmd [push|status|help]')
-                .demand(['cmd'])
-                .argv;
-var fs      = require('fs');
-var redis   = require("redis").createClient();
-var http    = require('http');
+    var $       = require('jQuery');
+    var helpers = require('./lib/js/helpers.js').create();
+    var argv    = require('optimist')
+                    .usage('Usage: ./app.js --cmd [push|status|help]')
+                    .demand(['cmd'])
+                    .argv;
+    var fs      = require('fs');
+    var redis   = require("redis").createClient();
+    var http    = require('http');
 
-// set logging level
-helpers.logging_threshold  = helpers.logging.debug;
+    // set logging level
+    helpers.logging_threshold  = helpers.logging.debug;
 
-// redis error management
-redis.on("error", function (err) {
-    helpers.logErr("Error " + err);
-});
-
-
-
-// Globals
-//==============
-
-var hostname = "localhost",
-    port = 4243,
-    image = "",
-    container = "",
-    abort = false;
-
-
-// Functions
-//==============
-
-
-// build
-//-------------------------------------------------------------------------------------------------
-//
-// Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
-//
-
-function build(){
-
-    helpers.logDebug('build: Start...');
-
-    var options = {
-      hostname: hostname,
-      port: port,
-      path: '/build',
-      method: 'POST'
-    };
-
-    var req = http.request(options, function(res) {
-      helpers.logDebug('build: STATUS: ' + res.statusCode);
-      helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
-
-      res.setEncoding('utf8');
-
-      res.on('data', function (chunk) {
-        console.log('build: ' + chunk);
-
-        // The last row looks like this 'Successfully built 3df239699c83'
-        if (chunk.slice(0,18) === 'Successfully built') {
-            image = chunk.slice(19,31);
-        }
-      });
-
+    // redis error management
+    redis.on("error", function (err) {
+        helpers.logErr("Error " + err);
     });
 
-    req.on('error', function(e) {
-      helpers.logErr('build: problem with request: ' + e.message);
-      process.exit();
-    });
 
-    req.on('end', function(e) {
-      helpers.logDebug('build: recieved end - : ' + e.message);
-    });
+    // Globals
+    //==============
 
-    // write data to the http.ClientRequest (which is a stream) returned by http.request() 
-    var fs = require('fs');
-    fs.createReadStream('webapp.tar').pipe(req);
-
-    helpers.logDebug('build: Data sent...');        
-}
+    var hostname = "localhost",
+        port = 4243,
+        image = "",
+        container = "",
+        abort = false;
 
 
-// createContainer
-//-------------------------------------------------------------------------------------------------
-//
-// create a container with the new image
-// curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
-// {"Id":"c6bfd6da99d3"}
+    // Functions
+    //==============
 
-function createContainer(){
 
-   var container = {
-     "Hostname":"",
-     "User":"",
-     "Memory":0,
-     "MemorySwap":0,
-     "AttachStdin":false,
-     "AttachStdout":true,
-     "AttachStderr":true,
-     "PortSpecs":null,
-     "Tty":false,
-     "OpenStdin":false,
-     "StdinOnce":false,
-     "Env":null,
-     "Cmd":[
-             "date"
-     ],
-     "Dns":null,
-     "Image":image,
-     "Volumes":{},
-     "VolumesFrom":""
-    };
+    // build
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
+    //
 
-    var options = {
-      hostname: hostname,
-      port: port,
-      path: '/containers/create',
-      method: 'POST'
-    };
+    this.build = function(){
 
-    helpers.logDebug('createContainer: Start...');
+        helpers.logDebug('build: Start...');
 
-    var req = http.request(options, function(res) {
-        helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
-        helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
+        var options = {
+          hostname: hostname,
+          port: port,
+          path: '/build',
+          method: 'POST'
+        };
 
-        res.setEncoding('utf8');
+        var req = http.request(options, function(res) {
+          helpers.logDebug('build: STATUS: ' + res.statusCode);
+          helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
 
-        res.on('data', function (chunk) {
-            console.log('createContainer: ' + chunk);
+          res.setEncoding('utf8');
 
-            // The result should look like this '{"Id":"c6bfd6da99d3"}'
-            container = JSON.parse(chunk).Id;            
+          res.on('data', function (chunk) {
+            console.log('build: ' + chunk);
+
+            // The last row looks like this 'Successfully built 3df239699c83'
+            if (chunk.slice(0,18) === 'Successfully built') {
+                image = chunk.slice(19,31);
+            }
+          });
+
         });
 
-    });
+        req.on('error', function(e) {
+          helpers.logErr('build: problem with request: ' + e.message);
+          process.exit();
+        });
 
-    req.on('error', function(e) {
-      helpers.logErr('createContainer: problem with request: ' + e.message);
-      process.exit();
-    });
+        req.on('end', function(e) {
+          helpers.logDebug('build: recieved end - : ' + e.message);
+        });
 
-    req.on('end', function(e) {
-      helpers.logDebug('createContainer: recieved end - ' + e.message);
-    });
+        // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+        var fs = require('fs');
+        fs.createReadStream('webapp.tar').pipe(req);
 
-    helpers.logDebug('createContainer: Data sent...');        
-}
+        helpers.logDebug('build: Data sent...');
 
-
-// start
-//-------------------------------------------------------------------------------------------------
-//
-// Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
-//
-
-function start(){
-
-    helpers.logDebug('start: Start...');
-
-    var binds = {
-        "Binds":["/tmp:/tmp"]
+        return true;
     };
 
-    var options = {
-      hostname: hostname,
-      port: port,
-      path: '/containers/'+container+'/start',
-      method: 'POST'
-    };
 
-    var req = http.request(options, function(res) {
-      helpers.logDebug('start: STATUS: ' + res.statusCode);
-      helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
+    // createContainer
+    //-------------------------------------------------------------------------------------------------
+    //
+    // create a container with the new image
+    // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
+    // {"Id":"c6bfd6da99d3"}
 
-      res.setEncoding('utf8');
+    this.createContainer = function(){
 
-      res.on('data', function (chunk) {
-        console.log('start: ' + chunk);
-      });
+       var container = {
+         "Hostname":"",
+         "User":"",
+         "Memory":0,
+         "MemorySwap":0,
+         "AttachStdin":false,
+         "AttachStdout":true,
+         "AttachStderr":true,
+         "PortSpecs":null,
+         "Tty":false,
+         "OpenStdin":false,
+         "StdinOnce":false,
+         "Env":null,
+         "Cmd":[
+                 "date"
+         ],
+         "Dns":null,
+         "Image":image,
+         "Volumes":{},
+         "VolumesFrom":""
+        };
 
-    });
+        var options = {
+          hostname: hostname,
+          port: port,
+          path: '/containers/create',
+          method: 'POST'
+        };
 
-    req.on('error', function(e) {
-      helpers.logErr('start: problem with request: ' + e.message);
-      process.exit();
-    });
+        helpers.logDebug('createContainer: Start...');
 
-    req.on('end', function(e) {
-      helpers.logDebug('start: recieved end - ' + e.message);
-    });
+        var req = http.request(options, function(res) {
+            helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
+            helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
 
-    helpers.logDebug('start: Data sent...');        
-}
+            res.setEncoding('utf8');
 
-// main
-//-------------------------------------------------------------------------------------------------
-//
+            res.on('data', function (chunk) {
+                console.log('createContainer: ' + chunk);
 
-switch (argv.cmd) {
-
-    case "push":
-        helpers.logDebug('main: running build()...');
-
-        $.when( build() )
-            .then( function() {
-                helpers.logDebug('main: running createContainer()...');
-                createContainer();
-            })
-            .fail( function() {
-                helpers.logErr('main: build failed...');
+                // The result should look like this '{"Id":"c6bfd6da99d3"}'
+                container = JSON.parse(chunk).Id;            
             });
 
-        
-        break;
+        });
 
-    case "help":
-        console.log('push: webapp.tar in the current directory will be deployed to the cloud');
-        console.log('help: show this message');
-        break;
+        req.on('error', function(e) {
+          helpers.logErr('createContainer: problem with request: ' + e.message);
+          process.exit();
+        });
 
-    case "status":
-        console.log('Not implemented yet!');
-        break;
+        req.on('end', function(e) {
+          helpers.logDebug('createContainer: recieved end - ' + e.message);
+        });
 
-    default:
-        console.log('No such command: ' + argv.cmd);
+        helpers.logDebug('createContainer: Data sent...');
 
-}
+        return true;
+   };
+
+
+    // start
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
+    //
+
+    this.start = function(){
+
+        helpers.logDebug('start: Start...');
+
+        var binds = {
+            "Binds":["/tmp:/tmp"]
+        };
+
+        var options = {
+          hostname: hostname,
+          port: port,
+          path: '/containers/'+container+'/start',
+          method: 'POST'
+        };
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('start: STATUS: ' + res.statusCode);
+          helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            console.log('start: ' + chunk);
+          });
+
+        });
+
+        req.on('error', function(e) {
+          helpers.logErr('start: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+          helpers.logDebug('start: recieved end - ' + e.message);
+        });
+
+        helpers.logDebug('start: Data sent...');        
+
+        return true;
+    };
+
+    // main
+    //-------------------------------------------------------------------------------------------------
+    //
+
+    switch (argv.cmd) {
+
+        case "push":
+            helpers.logDebug('main: running build()...');
+
+            $.when( this.build() )
+                .then( function() {
+                    helpers.logDebug('main: running createContainer()...');
+                    this.createContainer();
+                })
+                .fail( function() {
+                    helpers.logErr('main: build failed...');
+                });
+
+            
+            break;
+
+        case "help":
+            console.log('push: webapp.tar in the current directory will be deployed to the cloud');
+            console.log('help: show this message');
+            break;
+
+        case "status":
+            console.log('Not implemented yet!');
+            break;
+
+        default:
+            console.log('No such command: ' + argv.cmd);
+
+    }
 
 }());
