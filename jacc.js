@@ -95,7 +95,7 @@
                 image = chunk.slice(19,31);
 
                 // 'end' don't seam to be emitted, returning here instead
-                return;
+                //return;
             }
           });
 
