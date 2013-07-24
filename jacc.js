@@ -238,7 +238,7 @@
             $.when( this.build() )
                 .then( function() {
                     helpers.logDebug('main: running createContainer()...');
-                    this.createContainer();
+                    //this.createContainer();
                 })
                 .fail( function() {
                     helpers.logErr('main: build failed...');
