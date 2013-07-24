@@ -95,8 +95,9 @@
             if (chunk.slice(0,18) === 'Successfully built') {
                 image = chunk.slice(19,31);
 
+                helpers.logDebug('build: Build seams to be complete');
                 // 'end' don't seam to be emitted, returning here instead
-                //return;
+                return;
             }
           });
 
@@ -184,7 +185,7 @@
 
         req.on('end', function(e) {
             helpers.logDebug('createContainer: recieved end - ' + e.message);
-            http_req_ongoing = fasle;
+            http_req_ongoing = false;
         });
 
         helpers.logDebug('createContainer: Data sent...');
