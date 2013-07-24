@@ -250,14 +250,14 @@
             this.build();
 
             // Wait fo the build to complete
-            while (http_req_ongoing) {
+            /*while (http_req_ongoing) {
                 setTimeout((function() {
                   helpers.logDebug('main: waiting for http request to finish');
                 }), 3000);
             }
 
             helpers.logDebug('main: running createContainer()...');
-            this.createContainer();
+            this.createContainer();*/
             
             break;
 
