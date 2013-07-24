@@ -55,7 +55,7 @@
         port = 4243,
         image = "",
         container = "",
-        abort = false;
+        http_req_ongoing = false;
 
 
     // Functions
@@ -79,6 +79,8 @@
           method: 'POST'
         };
 
+        http_req_ongoing = true;
+
         var req = http.request(options, function(res) {
           helpers.logDebug('build: STATUS: ' + res.statusCode);
           helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
@@ -91,19 +93,23 @@
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
                 image = chunk.slice(19,31);
+
+                // 'end' don't seam to be emitted, returning here instead
+                return;
             }
           });
 
         });
 
         req.on('error', function(e) {
-          helpers.logErr('build: problem with request: ' + e.message);
-          process.exit();
+            helpers.logErr('build: problem with request: ' + e.message);
+            process.exit();
         });
 
         req.on('end', function(e) {
-          helpers.logDebug('build: recieved end - : ' + e.message);
-        });
+            helpers.logDebug('build: recieved end - : ' + e.message);
+            http_req_ongoing = false;
+       });
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
         var fs = require('fs');
@@ -153,6 +159,8 @@
 
         helpers.logDebug('createContainer: Start...');
 
+        http_req_ongoing = true;
+
         var req = http.request(options, function(res) {
             helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
             helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
@@ -174,7 +182,8 @@
         });
 
         req.on('end', function(e) {
-          helpers.logDebug('createContainer: recieved end - ' + e.message);
+            helpers.logDebug('createContainer: recieved end - ' + e.message);
+            http_req_ongoing = fasle;
         });
 
         helpers.logDebug('createContainer: Data sent...');
@@ -202,6 +211,8 @@
           method: 'POST'
         };
 
+        http_req_ongoing = true;
+
         var req = http.request(options, function(res) {
           helpers.logDebug('start: STATUS: ' + res.statusCode);
           helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
@@ -220,7 +231,8 @@
         });
 
         req.on('end', function(e) {
-          helpers.logDebug('start: recieved end - ' + e.message);
+            helpers.logDebug('start: recieved end - ' + e.message);
+            http_req_ongoing = fasle;
         });
 
         helpers.logDebug('start: Data sent...');        
@@ -233,17 +245,19 @@
     switch (argv.cmd) {
 
         case "push":
+
             helpers.logDebug('main: running build()...');
+            this.build();
 
-            $.when( this.build() )
-                .then( function() {
-                    helpers.logDebug('main: running createContainer()...');
-                    //this.createContainer();
-                })
-                .fail( function() {
-                    helpers.logErr('main: build failed...');
-                });
+            // Wait fo the build to complete
+            while (http_req_ongoing) {
+                setTimeout((function() {
+                  helpers.logDebug('main: waiting for http request to finish');
+                }), 3000);
+            }
 
+            helpers.logDebug('main: running createContainer()...');
+            this.createContainer();
             
             break;
 
