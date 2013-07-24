@@ -90,15 +90,16 @@ function build(){
         console.log('build: ' + chunk);
 
         // The last row looks like this 'Successfully built 3df239699c83'
-        if (chunk.slice(0,18) === 'Successfully built')
-            image = chunk.slice(19,31)
+        if (chunk.slice(0,18) === 'Successfully built') {
+            image = chunk.slice(19,31);
+        }
       });
 
     });
 
     req.on('error', function(e) {
       helpers.logErr('build: problem with request: ' + e.message);
-      process.exit;
+      process.exit();
     });
 
     req.on('end', function(e) {
@@ -170,7 +171,7 @@ function createContainer(){
 
     req.on('error', function(e) {
       helpers.logErr('createContainer: problem with request: ' + e.message);
-      process.exit;
+      process.exit();
     });
 
     req.on('end', function(e) {
@@ -216,7 +217,7 @@ function start(){
 
     req.on('error', function(e) {
       helpers.logErr('start: problem with request: ' + e.message);
-      process.exit;
+      process.exit();
     });
 
     req.on('end', function(e) {
@@ -235,13 +236,13 @@ switch (argv.cmd) {
     case "push":
         helpers.logDebug('main: running build()...');
 
-        $.when( build(); )
+        $.when( build() )
             .then( function() {
                 helpers.logDebug('main: running createContainer()...');
                 createContainer();
             })
             .fail( function() {
-                logErr('main: build failed...');
+                helpers.logErr('main: build failed...');
             });
 
         
@@ -253,11 +254,11 @@ switch (argv.cmd) {
         break;
 
     case "status":
-        helpers.logWarning('Not implemented yet!');
+        console.log('Not implemented yet!');
         break;
 
     default:
-        helpers.logErr('No such command: ' + argv.cmd);
+        console.log('No such command: ' + argv.cmd);
 
 }
 
