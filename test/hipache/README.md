@@ -1,15 +1,24 @@
+## Test hipache
 
-## Test hipache from the host
+
+### Preparations
+
+Start hipache:
+
+```
+../../bin/start-hipache
+cat ../../var/log/hipache.log 
+```
+
 
 Add a line in `/etc/hosts` for the web site that you use for testing
-
 
 
 ```
 127.0.0.1	www.dotcloud.com
 ```
 
-Check the IP adress and port:
+Start a app (../webapp for instance) and check the IP adress and port:
 
 ```
 >docker ps
@@ -24,26 +33,21 @@ ID                  IMAGE               COMMAND              CREATED            
 ```
 
 
-Configure hipache:
+### Configure hipache
 
-Remove old configuration:
+Remove old configuration:``redis-cli del frontend:www.dotcloud.com`
 
-```
-redis-cli del frontend:www.dotcloud.com
-```
-
-Add configuration:
+Add the new configuration:
 
 ```
 redis-cli rpush frontend:www.dotcloud.com mywebsite
 redis-cli rpush frontend:www.dotcloud.com http://172.16.42.3:8080
 ```
 
-View the configuration:
+View the configuration: `redis-cli lrange frontend:www.dotcloud.com 0 -1`
 
-```
-redis-cli lrange frontend:www.dotcloud.com 0 -1
-```
+
+### Test
 
 Make sure the destination app works:
 
@@ -52,14 +56,12 @@ Make sure the destination app works:
 Hello World
 ```
 
-Try to access the app (hipache is running on port 8080):
+Try to access the app (hipache is running on port 8080): `>curl http://www.dotcloud.com:8080`
 
-```
->curl www.dotcloud.com:8080
-```
+Check the hipache access log: `cat ../../var/log/hipache_access.log`
 
+Now test hipache when outside the host (this vagrant configuration maps port 8080 toward 8080 in
+the guest): `>curl http://www.dotcloud.com:8080`
 
-## Test hipache when outside the host
-
-Coming Soon
+Check the hipache access log again: `cat ../../var/log/hipache_access.log`
 
