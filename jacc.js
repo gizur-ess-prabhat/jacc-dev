@@ -110,8 +110,6 @@
         fs.createReadStream('webapp.tar').pipe(req);
 
         helpers.logDebug('build: Data sent...');
-
-        return true;
     };
 
 
@@ -180,8 +178,6 @@
         });
 
         helpers.logDebug('createContainer: Data sent...');
-
-        return true;
    };
 
 
@@ -228,8 +224,6 @@
         });
 
         helpers.logDebug('start: Data sent...');        
-
-        return true;
     };
 
     // main
