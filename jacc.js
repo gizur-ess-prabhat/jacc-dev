@@ -97,6 +97,7 @@
 
                 helpers.logDebug('build: Build seams to be complete');
                 // 'end' don't seam to be emitted, returning here instead
+                req.end();
                 return;
             }
           });
