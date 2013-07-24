@@ -53,7 +53,11 @@ redis.on("error", function (err) {
 //==============
 
 var hostname = "localhost",
-    port = 4243;
+    port = 4243,
+    image = "",
+    container = "",
+    abort = false;
+
 
 // Functions
 //==============
@@ -81,18 +85,24 @@ function build(){
       helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
 
       res.setEncoding('utf8');
+
       res.on('data', function (chunk) {
-        helpers.logDebug('build: BODY: ' + chunk);
+        console.log('build: ' + chunk);
+
+        // The last row looks like this 'Successfully built 3df239699c83'
+        if (chunk.slice(0,18) === 'Successfully built')
+            image = chunk.slice(19,31)
       });
 
     });
 
     req.on('error', function(e) {
       helpers.logErr('build: problem with request: ' + e.message);
+      process.exit;
     });
 
     req.on('end', function(e) {
-      helpers.logDebug('build: RECIEVED END, SHOULD EXIT: ' + e.message);
+      helpers.logDebug('build: recieved end - : ' + e.message);
     });
 
     // write data to the http.ClientRequest (which is a stream) returned by http.request() 
@@ -110,7 +120,7 @@ function build(){
 // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
 // {"Id":"c6bfd6da99d3"}
 
-function createContainer(image){
+function createContainer(){
 
    var container = {
      "Hostname":"",
@@ -144,29 +154,76 @@ function createContainer(image){
     helpers.logDebug('createContainer: Start...');
 
     var req = http.request(options, function(res) {
-      helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
-      helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
+        helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
+        helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
 
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        helpers.logDebug('createContainer: BODY: ' + chunk);
-      });
+        res.setEncoding('utf8');
+
+        res.on('data', function (chunk) {
+            console.log('createContainer: ' + chunk);
+
+            // The result should look like this '{"Id":"c6bfd6da99d3"}'
+            container = JSON.parse(chunk).Id;            
+        });
 
     });
 
     req.on('error', function(e) {
       helpers.logErr('createContainer: problem with request: ' + e.message);
+      process.exit;
     });
 
     req.on('end', function(e) {
-      helpers.logDebug('createContainer: RECIEVED END, SHOULD EXIT: ' + e.message);
+      helpers.logDebug('createContainer: recieved end - ' + e.message);
     });
 
-    // write data to the http.ClientRequest (which is a stream) returned by http.request() 
-    var fs = require('fs');
-    fs.createReadStream('webapp.tar').pipe(req);
-
     helpers.logDebug('createContainer: Data sent...');        
+}
+
+
+// start
+//-------------------------------------------------------------------------------------------------
+//
+// Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
+//
+
+function start(){
+
+    helpers.logDebug('start: Start...');
+
+    var binds = {
+        "Binds":["/tmp:/tmp"]
+    };
+
+    var options = {
+      hostname: hostname,
+      port: port,
+      path: '/containers/'+container+'/start',
+      method: 'POST'
+    };
+
+    var req = http.request(options, function(res) {
+      helpers.logDebug('start: STATUS: ' + res.statusCode);
+      helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
+
+      res.setEncoding('utf8');
+
+      res.on('data', function (chunk) {
+        console.log('start: ' + chunk);
+      });
+
+    });
+
+    req.on('error', function(e) {
+      helpers.logErr('start: problem with request: ' + e.message);
+      process.exit;
+    });
+
+    req.on('end', function(e) {
+      helpers.logDebug('start: recieved end - ' + e.message);
+    });
+
+    helpers.logDebug('start: Data sent...');        
 }
 
 // main
@@ -176,8 +233,18 @@ function createContainer(image){
 switch (argv.cmd) {
 
     case "push":
-        helpers.logDebug('push: running build...');
-        build();
+        helpers.logDebug('main: running build()...');
+
+        $.when( build(); )
+            .then( function() {
+                helpers.logDebug('main: running createContainer()...');
+                createContainer();
+            })
+            .fail( function() {
+                logErr('main: build failed...');
+            });
+
+        
         break;
 
     case "help":
