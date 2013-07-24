@@ -38,6 +38,7 @@
     var fs      = require('fs');
     var redis   = require("redis").createClient();
     var http    = require('http');
+    var async   = require('async');
 
     // set logging level
     helpers.logging_threshold  = helpers.logging.debug;
@@ -246,19 +247,18 @@
 
         case "push":
 
-            helpers.logDebug('main: running build()...');
-            this.build();
+            // Run the async functions one by one
+            async.series([
+                function(){
+                    helpers.logDebug('main: running build()...');
+                    this.build();
+                },
+                function(){
+                    helpers.logDebug('main: running createContainer()...');
+                    this.createContainer();
+                }
+            ]);
 
-            // Wait fo the build to complete
-            /*while (http_req_ongoing) {
-                setTimeout((function() {
-                  helpers.logDebug('main: waiting for http request to finish');
-                }), 3000);
-            }
-
-            helpers.logDebug('main: running createContainer()...');
-            this.createContainer();*/
-            
             break;
 
         case "help":
