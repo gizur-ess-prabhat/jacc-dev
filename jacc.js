@@ -98,9 +98,13 @@
                 helpers.logDebug('build: Build seams to be complete');
 
                 // 'end' don't seam to be emitted, returning here instead
-                req.end();
-                return;
+                //req.end();
+                //return;
             }
+          });
+
+          res.on('end', function () {
+            helpers.logDebug('build: res received end');
           });
 
         });
