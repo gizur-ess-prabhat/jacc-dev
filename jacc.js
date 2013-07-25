@@ -96,6 +96,7 @@
                 image = chunk.slice(19,31);
 
                 helpers.logDebug('build: Build seams to be complete');
+
                 // 'end' don't seam to be emitted, returning here instead
                 req.end();
                 return;
@@ -254,10 +255,12 @@
                 function(){
                     helpers.logDebug('main: running build()...');
                     this.build();
+                    helpers.logDebug('main: build() finished...');
                 },
                 function(){
                     helpers.logDebug('main: running createContainer()...');
                     this.createContainer();
+                    helpers.logDebug('main: createContainer() finished...');
                 }
             ]);
 
