@@ -261,12 +261,12 @@
 
             // Run the async functions one by one
             async.series([
-                function(){ helpers.logDebug('main: running build()...'); },
-                function(){ this.build(); },
-                function(){ helpers.logDebug('main: build() finished...'); },
-                function(){ helpers.logDebug('main: running createContainer()...'); },
-                function(){ this.createContainer(); },
-                function(){ helpers.logDebug('main: createContainer() finished...'); },
+                function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
+                function(fn){ this.build(); fn(null, 'one');},
+                function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
+                function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
+                function(fn){ this.createContainer(); fn(null, 'one');},
+                function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
             ]); 
 
             break;
