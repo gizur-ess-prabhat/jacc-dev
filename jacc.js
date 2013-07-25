@@ -260,8 +260,10 @@
 
         case "push":
 
+            this.build();
+
             // Run the async functions one by one
-            async.series([
+            /*async.series([
                 function(){
                     helpers.logDebug('main: running build()...');
                     this.build();
@@ -272,7 +274,7 @@
                     this.createContainer();
                     helpers.logDebug('main: createContainer() finished...');
                 }
-            ]);
+            ]); */
 
             break;
 
