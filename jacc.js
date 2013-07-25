@@ -96,7 +96,6 @@
                 image = chunk.slice(19,31);
 
                 helpers.logDebug('build: Build seams to be complete');
-
             }
           });
 
@@ -260,21 +259,15 @@
 
         case "push":
 
-            this.build();
-
             // Run the async functions one by one
-            /*async.series([
-                function(){
-                    helpers.logDebug('main: running build()...');
-                    this.build();
-                    helpers.logDebug('main: build() finished...');
-                },
-                function(){
-                    helpers.logDebug('main: running createContainer()...');
-                    this.createContainer();
-                    helpers.logDebug('main: createContainer() finished...');
-                }
-            ]); */
+            async.series([
+                function(){ helpers.logDebug('main: running build()...'); },
+                function(){ this.build(); },
+                function(){ helpers.logDebug('main: build() finished...'); },
+                function(){ helpers.logDebug('main: running createContainer()...'); },
+                function(){ this.createContainer(); },
+                function(){ helpers.logDebug('main: createContainer() finished...'); },
+            ]); 
 
             break;
 
