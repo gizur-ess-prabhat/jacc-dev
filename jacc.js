@@ -97,9 +97,6 @@
 
                 helpers.logDebug('build: Build seams to be complete');
 
-                // 'end' don't seam to be emitted, returning here instead
-                //req.end();
-                //return;
             }
           });
 
@@ -121,7 +118,16 @@
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
         var fs = require('fs');
-        fs.createReadStream('webapp.tar').pipe(req);
+        var stream = fs.createReadStream('webapp.tar');
+
+        // Close the request when the stream is closed
+        stream.on('end', function() {
+          helpers.logDebug('build: stream received end');
+          req.end();
+        };
+
+        // send the data
+        stream.pipe(req);
 
         helpers.logDebug('build: Data sent...');
     };
