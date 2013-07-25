@@ -36,7 +36,7 @@
                     .demand(['cmd'])
                     .argv;
     var fs      = require('fs');
-    var redis   = require("redis").createClient();
+    //var redis   = require("redis").createClient();
     var http    = require('http');
     var async   = require('async');
 
@@ -44,9 +44,9 @@
     helpers.logging_threshold  = helpers.logging.debug;
 
     // redis error management
-    redis.on("error", function (err) {
+    /*redis.on("error", function (err) {
         helpers.logErr("Error " + err);
-    });
+    });*/
 
 
     // Globals
@@ -291,5 +291,8 @@
             console.log('No such command: ' + argv.cmd);
 
     }
+
+    // close redis client
+    //redis.quit();
 
 }());
