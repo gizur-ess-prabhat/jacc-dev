@@ -285,7 +285,7 @@
     switch (argv.cmd) {
 
         case "push":
-            this._push();
+            this.push();
             break;
 
         case "help":
