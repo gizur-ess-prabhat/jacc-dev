@@ -69,7 +69,7 @@
     // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
     //
 
-    this.build = function(){
+    this._build = function(){
 
         helpers.logDebug('build: Start...');
 
@@ -139,7 +139,7 @@
     // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
     // {"Id":"c6bfd6da99d3"}
 
-    this.createContainer = function(){
+    this._createContainer = function(){
 
        var container = {
          "Hostname":"",
@@ -209,7 +209,7 @@
     // Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
     //
 
-    this.start = function(){
+    this._start = function(){
 
         helpers.logDebug('start: Start...');
 
@@ -251,6 +251,33 @@
         helpers.logDebug('start: Data sent...');        
     };
 
+
+    // push
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Will build an images, create a container and start the container
+    //
+
+    this.push = function(){
+
+        helpers.logDebug('push: Start...');
+
+        this._build();
+
+        // Run the async functions one by one
+        /*async.series([
+            function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
+            function(fn){ this._build(); fn(null, 'one');},
+            function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
+            function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
+            function(fn){ this._createContainer(); fn(null, 'one');},
+            function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
+        ]); */
+
+        helpers.logDebug('push: End of function, async processing will continue');
+    };
+
+
     // main
     //-------------------------------------------------------------------------------------------------
     //
@@ -258,17 +285,7 @@
     switch (argv.cmd) {
 
         case "push":
-
-            // Run the async functions one by one
-            async.series([
-                function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
-                function(fn){ this.build(); fn(null, 'one');},
-                function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
-                function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
-                function(fn){ this.createContainer(); fn(null, 'one');},
-                function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
-            ]); 
-
+            this._push();
             break;
 
         case "help":
