@@ -230,6 +230,9 @@
           method:   'POST'
         };
 
+        helpers.logDebug('start: path - ' + options.path);
+        helpers.logDebug('start: container - ' + container);
+
         var req = http.request(options, function(res) {
           helpers.logDebug('start: STATUS: ' + res.statusCode);
           helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
