@@ -256,6 +256,7 @@
             helpers.logDebug('start: recieved end - ' + e.message);
         });
 
+        req.write(JSON.stringify(binds));
         req.end();
 
         helpers.logDebug('start: Data sent...');        
