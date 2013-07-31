@@ -96,7 +96,7 @@
 
                 helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
             }
-          });
+          }.bind(this));
 
           res.on('end', function () {
             helpers.logDebug('build: res received end - image ID: ' + this._imageID);
@@ -112,7 +112,7 @@
 
         req.on('end', function(e) {
             helpers.logDebug('build: recieved end - : ' + e.message);
-       });
+        });
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
         var fs = require('fs');
