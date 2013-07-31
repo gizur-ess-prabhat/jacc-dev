@@ -532,6 +532,7 @@
             console.log(prettyjson.render(this._settings));
             fn(null, 'settings printed');
           }.bind(this),
+          function(fn){ this._updateRouter(fn); }.bind(this),
           function(fn){ this._close(fn); }.bind(this),
       ],
       function(err, results){
