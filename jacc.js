@@ -26,11 +26,12 @@
                     .demand(['cmd'])
                     .argv;
     var fs         = require('fs');
-    //var redis   = require("redis").createClient();
+    var redis   = require("redis").createClient();
     var http       = require('http');
     var async      = require('async');
     var nconf      = require('nconf');
     var prettyjson = require('prettyjson');
+
 
     // Some general setup
     // ================
@@ -61,13 +62,14 @@
 
     helpers.logDebug('setup: hostname: ' + this.hostname + ' port: ' + this.port);
 
+
     // hipache/redis setup
     // ================
 
     // redis error management
-    /*redis.on("error", function (err) {
+    redis.on("error", function (err) {
         helpers.logErr("Error " + err);
-    });*/
+    });
 
 
     // Globals
@@ -77,6 +79,16 @@
         _containerID = "",
         _settings    = {};
 
+
+    // Cleanup on exit
+    //==============
+
+    process.on('exit', function() {
+
+      // close redis client
+      redis.quit();
+      
+    }.bind(this));
 
     // Functions
     //==============
@@ -471,7 +483,6 @@
                 function(fn){ this._logs(fn); }.bind(this),
                 function(fn){ 
                   console.log(prettyjson.render(this._settings));
-                  console.log(JSON.stringify(this._settings));
                   fn(null, 'settings printed');
                 }.bind(this),
             ],
@@ -487,8 +498,5 @@
             console.log('No such command: ' + argv.cmd);
 
     }
-
-    // close redis client
-    //redis.quit();
 
 }());
