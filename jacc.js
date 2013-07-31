@@ -281,8 +281,8 @@
 
         async.series([
             function(fn){ this._build(fn); }.bind(this),
-            function(fn){ this._createContainer(fn).bind(this); },
-            function(fn){ this._start(fn).bind(this); },
+            function(fn){ this._createContainer(fn); }.bind(this),
+            function(fn){ this._start(fn); }.bind(this)
         ]);
 
         // Run the async functions one by one
