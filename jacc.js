@@ -54,9 +54,8 @@
 
     var hostname = "localhost",
         port = 4243,
-        image = "",
-        container = "",
-        http_req_ongoing = false;
+        image = "581ef261945e",
+        container = "";
 
 
     // Functions
@@ -79,8 +78,6 @@
           path: '/build',
           method: 'POST'
         };
-
-        http_req_ongoing = true;
 
         var req = http.request(options, function(res) {
           helpers.logDebug('build: STATUS: ' + res.statusCode);
@@ -112,7 +109,6 @@
 
         req.on('end', function(e) {
             helpers.logDebug('build: recieved end - : ' + e.message);
-            http_req_ongoing = false;
        });
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
@@ -172,8 +168,6 @@
 
         helpers.logDebug('createContainer: Start...');
 
-        http_req_ongoing = true;
-
         var req = http.request(options, function(res) {
             helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
             helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
@@ -196,7 +190,6 @@
 
         req.on('end', function(e) {
             helpers.logDebug('createContainer: recieved end - ' + e.message);
-            http_req_ongoing = false;
         });
 
         helpers.logDebug('createContainer: Data sent...');
@@ -224,8 +217,6 @@
           method: 'POST'
         };
 
-        http_req_ongoing = true;
-
         var req = http.request(options, function(res) {
           helpers.logDebug('start: STATUS: ' + res.statusCode);
           helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
@@ -245,7 +236,6 @@
 
         req.on('end', function(e) {
             helpers.logDebug('start: recieved end - ' + e.message);
-            http_req_ongoing = false;
         });
 
         helpers.logDebug('start: Data sent...');        
@@ -263,16 +253,17 @@
         helpers.logDebug('push: Start...');
 
         //this._build();
+        this._createContainer();
 
         // Run the async functions one by one
-        async.series([
+        /*async.series([
             //function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
             function(fn){ this._build(); fn(null, 'one');},
             //function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
             //function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
             function(fn){ this._createContainer(); fn(null, 'one');},
             //function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
-        ]);
+        ]);*/
 
         helpers.logDebug('push: End of function, async processing will continue');
     };
