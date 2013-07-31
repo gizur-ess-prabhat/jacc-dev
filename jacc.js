@@ -26,7 +26,7 @@
                     .demand(['cmd'])
                     .argv;
     var fs         = require('fs');
-    var redis   = require("redis").createClient();
+    var redis      = require("redis").createClient();
     var http       = require('http');
     var async      = require('async');
     var nconf      = require('nconf');
@@ -79,16 +79,6 @@
         _containerID = "",
         _settings    = {};
 
-
-    // Cleanup on exit
-    //==============
-
-    process.on('exit', function() {
-
-      // close redis client
-      redis.quit();
-      
-    }.bind(this));
 
     // Functions
     //==============
@@ -428,6 +418,25 @@
     };
 
 
+    // close
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Clenaup
+    //
+
+    this._close = function(asyncCallback){
+
+      helpers.logDebug('close: Start...');
+
+      // close redis client
+      redis.quit();
+ 
+      if(asyncCallback !== undefined) {
+        asyncCallback(null, 'close completed');
+      }
+
+    };
+
     // push
     //-------------------------------------------------------------------------------------------------
     //
@@ -444,6 +453,7 @@
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
+            function(fn){ this._close(fn); }.bind(this),
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
@@ -485,6 +495,7 @@
                   console.log(prettyjson.render(this._settings));
                   fn(null, 'settings printed');
                 }.bind(this),
+                function(fn){ this._close(fn); }.bind(this),
             ],
             function(err, results){
               helpers.logDebug('status: results of async functions - ' + results);
