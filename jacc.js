@@ -178,7 +178,8 @@
                 console.log('createContainer: ' + chunk);
 
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
-                container = JSON.parse(chunk).Id;            
+                this.container = JSON.parse(chunk).Id;            
+              helpers.logDebug('createContainer: container created with ID: ' + this.container);
             });
 
         });
