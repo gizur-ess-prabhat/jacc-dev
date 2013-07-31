@@ -363,7 +363,7 @@
 
           res.on('end', function () {
             helpers.logDebug('logs: res received end');
-            if(asyncCallback !=== undefined) {
+            if(asyncCallback !== undefined) {
               asyncCallback(null, 'logs completed');
             }
           });
