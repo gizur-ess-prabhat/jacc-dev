@@ -321,7 +321,9 @@
 
           res.on('end', function () {
             helpers.logDebug('inspect: res received end');
-            asyncCallback(null, 'inspect:'+ this._settings.NetworkSettings.IPAddress);
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'inspect:'+ this._settings.NetworkSettings.IPAddress);
+            }
           });
 
         }.bind(this));
