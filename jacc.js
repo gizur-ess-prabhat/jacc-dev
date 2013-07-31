@@ -86,6 +86,8 @@
 
     this._updateRouter = function(asyncCallback){
 
+      helpers.logDebug('updateRouter: Start...');
+
       var redis_client = redis.createClient();
 
       redis_client.on("connect", function () {
@@ -98,6 +100,8 @@
                              redis.print);
 
           redis_client.quit();
+
+          helpers.logDebug('updateRouter: backend - ' + backend);
 
           if(asyncCallback !== undefined) {
             asyncCallback(null, 'updateRouter:'+ backend);
