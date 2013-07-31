@@ -68,7 +68,7 @@
     // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
     //
 
-    this._build = function(){
+    this._build = function(asyncCallback){
 
         helpers.logDebug('build: Start...');
 
@@ -120,6 +120,7 @@
         stream.on('end', function() {
           helpers.logDebug('build: stream received end');
           req.end();
+          asyncCallback(null, 'image:'+image);
         });
 
         // send the data
@@ -136,7 +137,7 @@
     // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
     // {"Id":"c6bfd6da99d3"}
 
-    this._createContainer = function(){
+    this._createContainer = function(asyncCallback){
 
        var container = {
          "Hostname":"",
@@ -180,8 +181,8 @@
                 helpers.logInfo('createContainer: ' + chunk);
 
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
-                this.container = JSON.parse(chunk).Id;            
-              helpers.logDebug('createContainer: container created with ID: ' + this.container);
+                container = JSON.parse(chunk).Id;            
+                helpers.logDebug('createContainer: container created with ID: ' + this.container);
             });
 
         });
@@ -193,6 +194,7 @@
 
         req.on('end', function(e) {
             helpers.logDebug('createContainer: recieved end - ' + e.message);
+            asyncCallback(null, 'container:'+container);
         });
 
         req.write(JSON.stringify(container));
@@ -208,7 +210,7 @@
     // Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
     //
 
-    this._start = function(){
+    this._start = function(asyncCallback){
 
         helpers.logDebug('start: Start...');
 
@@ -243,6 +245,7 @@
 
         req.on('end', function(e) {
             helpers.logDebug('start: recieved end - ' + e.message);
+            asyncCallback(null, 'started');
         });
 
         req.end();
@@ -266,8 +269,9 @@
         //this._start();
 
         async.series([
-            function(fn){ this._createContainer();  fn(null, 'one');},
-            function(fn){ this._start();            fn(null, 'two');},
+            function(fn){ this._build(fn); },
+            function(fn){ this._createContainer(fn); },
+            function(fn){ this._start(fn); },
         ]);
 
         // Run the async functions one by one
