@@ -101,7 +101,7 @@
           res.on('end', function () {
             helpers.logDebug('build: res received end - image ID: ' + this._imageID);
             asyncCallback(null, 'image:'+this._imageID);
-          });
+          }.bind(this));
 
         }.bind(this));
 
@@ -184,14 +184,14 @@
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
                 this._containerID = JSON.parse(chunk).Id;            
                 helpers.logDebug('createContainer: container created with ID: ' + this._container);
-            });
+            }.bind(this));
 
             res.on('end', function () {
               helpers.logDebug('createContainer: res received end');
               asyncCallback(null, 'container:'+this._containerID);
-            });
+            }.bind(this));
 
-        });
+        }.bind(this));
 
         req.on('error', function(e) {
           helpers.logErr('createContainer: problem with request: ' + e.message);
@@ -250,7 +250,7 @@
             asyncCallback(null, 'start completed');
           });
 
-        });
+        }.bind(this));
 
         req.on('error', function(e) {
           helpers.logErr('start: problem with request: ' + e.message);
