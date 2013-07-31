@@ -54,8 +54,8 @@
 
     var hostname  = "localhost",
         port      = 4243,
-        image     = "581ef261945e",
-        container = "6b7d33a7575b";
+        image     = "",
+        container = "";
 
 
     // Functions
@@ -280,9 +280,9 @@
         //this._start();
 
         async.series([
-            function(fn){ this._build(fn); },
-            function(fn){ this._createContainer(fn); },
-            function(fn){ this._start(fn); },
+            function(fn){ this._build(fn); }.bind(this),
+            function(fn){ this._createContainer(fn).bind(this); },
+            function(fn){ this._start(fn).bind(this); },
         ]);
 
         // Run the async functions one by one
