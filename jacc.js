@@ -29,8 +29,8 @@
     // Includes
     // ================
 
-    var $       = require('jQuery');
-    var helpers = require('./lib/js/helpers.js').create();
+    //var $       = require('jQuery');
+    var helpers = require('helpersjs').create();
     var argv    = require('optimist')
                     .usage('Usage: ./app.js --cmd [push|status|help]')
                     .demand(['cmd'])
