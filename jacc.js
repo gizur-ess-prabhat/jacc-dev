@@ -174,8 +174,8 @@
         };
 
         var options = {
-          hostname: hostname,
-          port: port,
+          hostname: this.hostname,
+          port: this.port,
           path: '/containers/create',
           method: 'POST'
         };
@@ -241,8 +241,8 @@
         };
 
         var options = {
-          hostname: hostname,
-          port:     port,
+          hostname: this.hostname,
+          port:     this.port,
           path:     '/containers/'+this._containerID+'/start',
           method:   'POST'
         };
@@ -301,8 +301,8 @@
         }
 
         var options = {
-          hostname: hostname,
-          port:     port,
+          hostname: this.hostname,
+          port:     this.port,
           path:     '/containers/'+this._containerID+'/json',
           method:   'GET'
         };
