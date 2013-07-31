@@ -39,7 +39,7 @@
     var hostname,
         port;
 
-    nconf.use('file', { file: './config.json' });
+    nconf.use('file', { file: __dirname + '/config.json' });
     nconf.load();
 
     this.hostname = nconf.get('hostname');
@@ -47,6 +47,8 @@
 
     // set logging level
     helpers.logging_threshold  = helpers.logging.debug;
+
+    helpers.logDebug('setup: hostname: ' + this.hostname + ' port: ' + this.port);
 
 
     // hipache/redis setup
