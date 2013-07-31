@@ -192,6 +192,9 @@
             helpers.logDebug('createContainer: recieved end - ' + e.message);
         });
 
+        req.write(JSON.stringify(container));
+        req.end();
+
         helpers.logDebug('createContainer: Data sent...');
    };
 
