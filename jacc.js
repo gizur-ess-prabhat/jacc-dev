@@ -20,9 +20,6 @@
 // Get the logs of the started container (should show the current date since that's all the container does)
 // curl -H "Content-Type: application/vnd.docker.raw-stream" -d '' "http://localhost:4243/containers/c6bfd6da99d3/attach?logs=1&stream=0&stdout=1"
 
-// Inspect the container
-// curl -G http://localhost:4243/containers/c6bfd6da99d3/json
-
 
 (function(){
 
@@ -140,12 +137,12 @@
 
     this._createContainer = function(asyncCallback){
 
-/*
-         "Cmd":[
-                 "date"
-         ],
-*/
-       var container = {
+        if (this._imageID === "") {
+          helpers.logErr('createContainer: this._imageID not set');
+          process.exit();        
+        }
+
+        var container = {
          "Hostname":"",
          "User":"",
          "Memory":0,
@@ -222,6 +219,11 @@
 
         helpers.logDebug('start: Start...');
 
+        if (this._containerID === "") {
+          helpers.logErr('start: this._containerID not set');
+          process.exit();        
+        }
+
         var binds = {
             "Binds":["/tmp:/tmp"]
         };
@@ -271,6 +273,61 @@
     };
 
 
+    // inspect
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -G http://localhost:4243/containers/c6bfd6da99d3/json
+    //
+
+    this._inspect = function(asyncCallback){
+
+        helpers.logDebug('inspect: Start...');
+
+        if (this._containerID === "") {
+          helpers.logErr('inspect: this._containerID not set');
+          process.exit();        
+        }
+
+        var options = {
+          hostname: hostname,
+          port:     port,
+          path:     '/containers/'+this._containerID+'/json',
+          method:   'GET'
+        };
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('inspect: STATUS: ' + res.statusCode);
+          helpers.logDebug('inspect: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('inspect: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('start: ' + chunk);
+          });
+
+          res.on('end', function () {
+            helpers.logDebug('inspect: res received end');
+            asyncCallback(null, 'inspect completed');
+          });
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('inspect: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('inspect: recieved end - ' + e.message);
+        });
+
+        req.end();
+
+        helpers.logDebug('inspect: Data sent...');        
+    };
+
+
     // push
     //-------------------------------------------------------------------------------------------------
     //
@@ -284,7 +341,8 @@
         async.series([
             function(fn){ this._build(fn); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
-            function(fn){ this._start(fn); }.bind(this)
+            function(fn){ this._start(fn); }.bind(this),
+            function(fn){ this._inspect(fn); }.bind(this)
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
