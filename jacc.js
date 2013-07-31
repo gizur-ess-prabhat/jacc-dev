@@ -185,6 +185,11 @@
                 helpers.logDebug('createContainer: container created with ID: ' + container);
             });
 
+            res.on('end', function () {
+              helpers.logDebug('createContainer: res received end');
+              asyncCallback(null, 'image:'+image);
+            });
+
         });
 
         req.on('error', function(e) {
@@ -194,7 +199,6 @@
 
         req.on('end', function(e) {
             helpers.logDebug('createContainer: recieved end - ' + e.message);
-            asyncCallback(null, 'container:'+container);
         });
 
         req.write(JSON.stringify(container));
@@ -234,6 +238,11 @@
 
           res.on('data', function (chunk) {
             helpers.logInfo('start: ' + chunk);
+
+          res.on('end', function () {
+            helpers.logDebug('start: res received end');
+          });
+
           });
 
         });
@@ -245,7 +254,6 @@
 
         req.on('end', function(e) {
             helpers.logDebug('start: recieved end - ' + e.message);
-            asyncCallback(null, 'started');
         });
 
         req.end();
