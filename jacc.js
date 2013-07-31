@@ -183,7 +183,7 @@
 
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
                 this._containerID = JSON.parse(chunk).Id;            
-                helpers.logDebug('createContainer: container created with ID: ' + this._container);
+                helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
             }.bind(this));
 
             res.on('end', function () {
@@ -232,7 +232,7 @@
         };
 
         helpers.logDebug('start: path - ' + options.path);
-        helpers.logDebug('start: container - ' + container);
+        helpers.logDebug('start: container - ' + this._containerID);
 
         var req = http.request(options, function(res) {
           helpers.logDebug('start: STATUS: ' + res.statusCode);
