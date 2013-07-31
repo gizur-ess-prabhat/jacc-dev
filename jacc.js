@@ -454,9 +454,21 @@
             }
 
             this._containerID = argv.container;
-            this._logs();
-            this._inspect();
-            console.log(prettyjson.render(this._settings));
+
+            async.series([
+                function(fn){ this._inspect(fn); }.bind(this),
+                function(fn){ this._logs(fn); }.bind(this),
+                function(fn){ 
+                  console.log(prettyjson.render(JSON.stringify(this._settings)));
+                  fn(null, 'settings printed');
+                }.bind(this),
+            ],
+            function(err, results){
+              helpers.logDebug('status: results of async functions - ' + results);
+              helpers.logDebug('status: errors (if any) - ' + err);
+            });
+
+            
             break;
 
         default:
