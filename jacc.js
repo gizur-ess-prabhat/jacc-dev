@@ -281,7 +281,7 @@
 
         async.series([
             function(fn){ this._build(fn); }.bind(this),
-            function(fn) { helpers.logDebug('async: Image ID: ' + this._imageID); fn(null,''); },
+            function(fn) { helpers.logDebug('async: Image ID: ' + this._imageID); fn(null,''); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this)
         ],
