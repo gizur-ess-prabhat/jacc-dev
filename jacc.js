@@ -328,14 +328,14 @@
             this._settings = JSON.parse(chunk);
             helpers.logInfo('inspect: ' + this._settings);
             helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
-          });
+          }.bind(this));
 
           res.on('end', function () {
             helpers.logDebug('inspect: res received end');
             if(asyncCallback !== undefined) {
               asyncCallback(null, 'inspect:'+ this._settings.NetworkSettings.IPAddress);
             }
-          });
+          }.bind(this));
 
         }.bind(this));
 
