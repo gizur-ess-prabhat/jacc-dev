@@ -30,8 +30,27 @@
     var http    = require('http');
     var async   = require('async');
 
+    var nconf = require('nconf');
+
+
+    // Some general setup
+    // ================
+
+    var hostname,
+        port;
+
+    nconf.use('file', { file: './config.json' });
+    nconf.load();
+
+    this.hostname = nconf.get('hostname');
+    this.port     = nconf.get('port');
+
     // set logging level
     helpers.logging_threshold  = helpers.logging.debug;
+
+
+    // hipache/redis setup
+    // ================
 
     // redis error management
     /*redis.on("error", function (err) {
@@ -42,9 +61,7 @@
     // Globals
     //==============
 
-    var hostname     = "localhost",
-        port         = 4243,
-        _imageID     = "",
+    var  _imageID     = "",
         _containerID = "",
         _settings    = {};
 
