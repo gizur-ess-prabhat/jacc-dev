@@ -82,6 +82,7 @@
         var req = http.request(options, function(res) {
           helpers.logDebug('build: STATUS: ' + res.statusCode);
           helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('build: options: ' + JSON.stringify(options));
 
           res.setEncoding('utf8');
 
@@ -171,6 +172,7 @@
         var req = http.request(options, function(res) {
             helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
             helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
+            helpers.logDebug('createContainer: options: ' + JSON.stringify(options));
 
             res.setEncoding('utf8');
 
@@ -224,6 +226,7 @@
         var req = http.request(options, function(res) {
           helpers.logDebug('start: STATUS: ' + res.statusCode);
           helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('start: options: ' + JSON.stringify(options));
 
           res.setEncoding('utf8');
 
