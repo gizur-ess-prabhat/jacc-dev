@@ -30,7 +30,7 @@
     // ================
 
     //var $       = require('jQuery');
-    var helpers = require('helpersjs.min').create();
+    var helpers = require('helpersjs.min.js').create();
     var argv    = require('optimist')
                     .usage('Usage: ./app.js --cmd [push|status|help]')
                     .demand(['cmd'])
