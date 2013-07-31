@@ -112,7 +112,6 @@
 
         req.on('end', function(e) {
             helpers.logDebug('build: recieved end - : ' + e.message);
-            helpers.logDebug('build: recieved end - Imge ID: ' + this._imageID);
        });
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
@@ -282,6 +281,7 @@
 
         async.series([
             function(fn){ this._build(fn); }.bind(this),
+            function(fn) { helpers.logDebug('async: Image ID: ' + this._imageID); fn(null,''); },
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this)
         ],
