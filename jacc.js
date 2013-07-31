@@ -14,13 +14,6 @@
 //------------------------------
 
 
-// start the new container
-// curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
-
-// Get the logs of the started container (should show the current date since that's all the container does)
-// curl -H "Content-Type: application/vnd.docker.raw-stream" -d '' "http://localhost:4243/containers/c6bfd6da99d3/attach?logs=1&stream=0&stdout=1"
-
-
 (function(){
 
     // Includes
@@ -310,7 +303,7 @@
 
           res.on('end', function () {
             helpers.logDebug('inspect: res received end');
-            asyncCallback(null, 'inspect completed');
+            asyncCallback(null, 'inspect:'+ this._settings.NetworkSettings.IPAddress);
           });
 
         }.bind(this));
@@ -330,6 +323,68 @@
     };
 
 
+
+    // inspect
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Get the logs of the started container (should show the current date since that's all the container does)
+    // Equivalent of: curl -H "Content-Type: application/vnd.docker.raw-stream" -d '' "http://localhost:4243/containers/c6bfd6da99d3/attach?logs=1&stream=0&stdout=1"
+    //
+
+    this._logs = function(asyncCallback){
+
+        helpers.logDebug('logs: Start...');
+
+        if (this._containerID === "") {
+          helpers.logErr('logs: this._containerID not set');
+          process.exit();        
+        }
+
+        var options = {
+          hostname: hostname,
+          port:     port,
+          path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
+          method:   'GET',
+          headers: {
+            'Content-Type': 'application/vnd.docker.raw-stream',
+          }
+        };
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('logs: STATUS: ' + res.statusCode);
+          helpers.logDebug('logs: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('logs: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('logs: ' + chunk);
+          });
+
+          res.on('end', function () {
+            helpers.logDebug('logs: res received end');
+            if(asyncCallback !=== undefined) {
+              asyncCallback(null, 'logs completed');
+            }
+          });
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('logs: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('logs: recieved end - ' + e.message);
+        });
+
+        req.end();
+
+        helpers.logDebug('logs: Data sent...');        
+    };
+
+
     // push
     //-------------------------------------------------------------------------------------------------
     //
@@ -344,7 +399,7 @@
             function(fn){ this._build(fn); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this),
-            function(fn){ this._inspect(fn); }.bind(this)
+            function(fn){ this._inspect(fn); }.bind(this),
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
@@ -372,6 +427,7 @@
 
         case "status":
             console.log('Not implemented yet!');
+            this._logs();
             break;
 
         default:
