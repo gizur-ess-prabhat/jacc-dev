@@ -335,7 +335,7 @@
 
         helpers.logDebug('logs: Start...');
 
-        if (this._containerID === "") {
+        if (this._containerID === "" || this._containerID === undefined) {
           helpers.logErr('logs: this._containerID not set');
           process.exit();        
         }
@@ -421,12 +421,20 @@
             break;
 
         case "help":
-            console.log('push: webapp.tar in the current directory will be deployed to the cloud');
-            console.log('help: show this message');
+            console.log('--cmd push: webapp.tar in the current directory will be deployed to the cloud');
+            console.log('--cmd status --container=XXX: show logs for container');
+            console.log('--help: show this message');
             break;
 
         case "status":
             console.log('Not implemented yet!');
+
+            if (argv.container === "" || argv.container === undefined) {
+              console.log('status requres the container parameter to be set!');
+              process.exit();        
+            }
+            
+            this._containerID = argv.container;
             this._logs();
             break;
 
