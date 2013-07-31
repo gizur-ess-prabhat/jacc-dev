@@ -94,16 +94,16 @@
             if (chunk.slice(0,18) === 'Successfully built') {
                 this._imageID = chunk.slice(19,31);
 
-                helpers.logDebug('build: Build seams to be complete - image ID:' + this._imageID );
+                helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
             }
           });
 
           res.on('end', function () {
-            helpers.logDebug('build: res received end');
+            helpers.logDebug('build: res received end - image ID: ' + this._imageID);
             asyncCallback(null, 'image:'+this._imageID);
           });
 
-        });
+        }.bind(this));
 
         req.on('error', function(e) {
             helpers.logErr('build: problem with request: ' + e.message);
