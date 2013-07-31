@@ -55,7 +55,7 @@
     var hostname = "localhost",
         port = 4243,
         image = "581ef261945e",
-        container = "";
+        container = "6b7d33a7575b";
 
 
     // Functions
@@ -242,6 +242,8 @@
             helpers.logDebug('start: recieved end - ' + e.message);
         });
 
+        req.end();
+
         helpers.logDebug('start: Data sent...');        
     };
 
@@ -257,7 +259,8 @@
         helpers.logDebug('push: Start...');
 
         //this._build();
-        this._createContainer();
+        //this._createContainer();
+        this._start();
 
         // Run the async functions one by one
         /*async.series([
