@@ -187,7 +187,7 @@
 
             res.on('end', function () {
               helpers.logDebug('createContainer: res received end');
-              asyncCallback(null, 'image:'+image);
+              asyncCallback(null, 'container:'+container);
             });
 
         });
@@ -239,11 +239,11 @@
 
           res.on('data', function (chunk) {
             helpers.logInfo('start: ' + chunk);
+          });
 
           res.on('end', function () {
             helpers.logDebug('start: res received end');
-          });
-
+            asyncCallback(null, 'start completed');
           });
 
         });
@@ -275,25 +275,15 @@
 
         helpers.logDebug('push: Start...');
 
-        //this._build();
-        //this._createContainer();
-        //this._start();
-
         async.series([
             function(fn){ this._build(fn); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this)
-        ]);
-
-        // Run the async functions one by one
-        /*async.series([
-            //function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
-            function(fn){ this._build(); fn(null, 'one');},
-            //function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
-            //function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
-            function(fn){ this._createContainer(); fn(null, 'one');},
-            //function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
-        ]);*/
+        ],
+        function(err, results){
+          helpers.logDebug('push: results of async functions - ' + results);
+          helpers.logDebug('push: errors (if any) - ' + err);
+        });
 
         helpers.logDebug('push: End of function, async processing will continue');
     };
