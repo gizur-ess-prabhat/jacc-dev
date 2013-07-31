@@ -49,11 +49,11 @@
     // Globals
     //==============
 
-    var hostname  = "localhost",
-        port      = 4243;
-
-    this._imageID     = "";
-    this._containerID = "";
+    var hostname     = "localhost",
+        port         = 4243,
+        _imageID     = "",
+        _containerID = "",
+        _settings    = {};
 
 
     // Functions
@@ -303,7 +303,9 @@
           res.setEncoding('utf8');
 
           res.on('data', function (chunk) {
-            helpers.logInfo('start: ' + chunk);
+            this._settings = JSON.parse(chunk);
+            helpers.logInfo('inspect: ' + this._settings);
+            helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
           });
 
           res.on('end', function () {
