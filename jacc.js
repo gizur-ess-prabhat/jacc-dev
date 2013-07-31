@@ -112,6 +112,7 @@
 
         req.on('end', function(e) {
             helpers.logDebug('build: recieved end - : ' + e.message);
+            helpers.logDebug('build: recieved end - Imge ID: ' + this._imageID);
        });
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
