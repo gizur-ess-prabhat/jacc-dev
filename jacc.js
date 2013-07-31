@@ -53,9 +53,10 @@
     //==============
 
     var hostname  = "localhost",
-        port      = 4243,
-        image     = "",
-        container = "";
+        port      = 4243;
+
+    this._image     = "";
+    this._container = "";
 
 
     // Functions
@@ -91,7 +92,7 @@
 
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
-                image = chunk.slice(19,31);
+                this._image = chunk.slice(19,31);
 
                 helpers.logDebug('build: Build seams to be complete');
             }
@@ -99,7 +100,7 @@
 
           res.on('end', function () {
             helpers.logDebug('build: res received end');
-            asyncCallback(null, 'image:'+image);
+            asyncCallback(null, 'image:'+this._image);
           });
 
         });
@@ -156,7 +157,7 @@
                  "date"
          ],
          "Dns":null,
-         "Image":image,
+         "Image":this._image,
          "Volumes":{},
          "VolumesFrom":""
         };
@@ -181,13 +182,13 @@
                 helpers.logInfo('createContainer: ' + chunk);
 
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
-                container = JSON.parse(chunk).Id;            
-                helpers.logDebug('createContainer: container created with ID: ' + container);
+                this._container = JSON.parse(chunk).Id;            
+                helpers.logDebug('createContainer: container created with ID: ' + this._container);
             });
 
             res.on('end', function () {
               helpers.logDebug('createContainer: res received end');
-              asyncCallback(null, 'container:'+container);
+              asyncCallback(null, 'container:'+this._container);
             });
 
         });
@@ -202,7 +203,7 @@
         });
 
         helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
-        req.write(JSON.stringify(container));
+        req.write(JSON.stringify(this._container));
         req.end();
 
         helpers.logDebug('createContainer: Data sent...');
@@ -226,7 +227,7 @@
         var options = {
           hostname: hostname,
           port:     port,
-          path:     '/containers/'+container+'/start',
+          path:     '/containers/'+this._container+'/start',
           method:   'POST'
         };
 
