@@ -155,7 +155,7 @@
                  "date"
          ],
          "Dns":null,
-         "Image":image,
+         "Image":this.image,
          "Volumes":{},
          "VolumesFrom":""
         };
@@ -218,9 +218,9 @@
 
         var options = {
           hostname: hostname,
-          port: port,
-          path: '/containers/'+this.container+'/start',
-          method: 'POST'
+          port:     port,
+          path:     '/containers/'+container+'/start',
+          method:   'POST'
         };
 
         var req = http.request(options, function(res) {
@@ -263,7 +263,12 @@
 
         //this._build();
         //this._createContainer();
-        this._start();
+        //this._start();
+
+        async.series([
+            function(fn){ this._createContainer();  fn(null, 'one');},
+            function(fn){ this._start();            fn(null, 'two');},
+        ]);
 
         // Run the async functions one by one
         /*async.series([
