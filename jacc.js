@@ -83,8 +83,8 @@
         helpers.logDebug('build: Start...');
 
         var options = {
-          hostname: hostname,
-          port: port,
+          hostname: this.hostname,
+          port: this.port,
           path: '/build',
           method: 'POST'
         };
@@ -360,8 +360,8 @@
         }
 
         var options = {
-          hostname: hostname,
-          port:     port,
+          hostname: this.hostname,
+          port:     this.port,
           path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
           method:   'POST',
           headers: {
