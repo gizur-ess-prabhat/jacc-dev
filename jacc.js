@@ -202,7 +202,7 @@
             helpers.logDebug('createContainer: recieved end - ' + e.message);
         });
 
-        helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
+        helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(this._container));
         req.write(JSON.stringify(this._container));
         req.end();
 
