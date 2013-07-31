@@ -140,6 +140,11 @@
 
     this._createContainer = function(asyncCallback){
 
+/*
+         "Cmd":[
+                 "date"
+         ],
+*/
        var container = {
          "Hostname":"",
          "User":"",
@@ -153,9 +158,6 @@
          "OpenStdin":false,
          "StdinOnce":false,
          "Env":null,
-         "Cmd":[
-                 "date"
-         ],
          "Dns":null,
          "Image":this._imageID,
          "Volumes":{},
@@ -281,7 +283,6 @@
 
         async.series([
             function(fn){ this._build(fn); }.bind(this),
-            function(fn) { helpers.logDebug('async: Image ID: ' + this._imageID); fn(null,''); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this)
         ],
