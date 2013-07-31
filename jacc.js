@@ -501,6 +501,7 @@
             function(fn){ this._inspect(fn); }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
             function(fn){ this._close(fn); }.bind(this),
+            function(fn){ this._updateRouter(fn); }.bind(this),
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
@@ -536,7 +537,6 @@
             console.log(prettyjson.render(this._settings));
             fn(null, 'settings printed');
           }.bind(this),
-          function(fn){ this._updateRouter(fn); }.bind(this),
           function(fn){ this._close(fn); }.bind(this),
       ],
       function(err, results){
