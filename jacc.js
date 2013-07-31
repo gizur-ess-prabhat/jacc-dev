@@ -52,9 +52,9 @@
     // Globals
     //==============
 
-    var hostname = "localhost",
-        port = 4243,
-        image = "581ef261945e",
+    var hostname  = "localhost",
+        port      = 4243,
+        image     = "581ef261945e",
         container = "6b7d33a7575b";
 
 
@@ -155,7 +155,7 @@
                  "date"
          ],
          "Dns":null,
-         "Image":this.image,
+         "Image":image,
          "Volumes":{},
          "VolumesFrom":""
         };
