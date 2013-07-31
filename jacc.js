@@ -99,6 +99,7 @@
 
           res.on('end', function () {
             helpers.logDebug('build: res received end');
+            asyncCallback(null, 'image:'+image);
           });
 
         });
@@ -120,7 +121,6 @@
         stream.on('end', function() {
           helpers.logDebug('build: stream received end');
           req.end();
-          asyncCallback(null, 'image:'+image);
         });
 
         // send the data
@@ -182,7 +182,7 @@
 
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
                 container = JSON.parse(chunk).Id;            
-                helpers.logDebug('createContainer: container created with ID: ' + this.container);
+                helpers.logDebug('createContainer: container created with ID: ' + container);
             });
 
         });
