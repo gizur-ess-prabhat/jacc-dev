@@ -78,14 +78,6 @@
     // hipache functions
     //======================================================================
 
-    // hipache/redis setup
-    // -------------------------------------------------------------------------------------------------
-
-    // redis error management
-    redis.on("error", function (err) {
-        helpers.logErr("Redis error: " + err);
-    });
-
     // build
     //-------------------------------------------------------------------------------------------------
     //
@@ -112,6 +104,11 @@
           }
 
       }.bind(this));
+
+      // redis error management
+      redis_client.on("error", function (err) {
+          helpers.logErr("Redis error: " + err);
+      });
 
     };
 
