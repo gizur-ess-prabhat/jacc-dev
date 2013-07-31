@@ -344,7 +344,7 @@
           hostname: hostname,
           port:     port,
           path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
-          method:   'GET',
+          method:   'POST',
           headers: {
             'Content-Type': 'application/vnd.docker.raw-stream',
           }
@@ -427,13 +427,11 @@
             break;
 
         case "status":
-            console.log('Not implemented yet!');
-
             if (argv.container === "" || argv.container === undefined) {
-              console.log('status requres the container parameter to be set!');
+              console.log('status requires the container parameter to be set!');
               process.exit();        
             }
-            
+
             this._containerID = argv.container;
             this._logs();
             break;
