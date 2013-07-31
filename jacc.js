@@ -43,22 +43,23 @@
 
     this.hostname = nconf.get('hostname');
     this.port     = nconf.get('port');
-    helpers.logDebug('setup: hostname: ' + this.hostname + ' port: ' + this.port);
 
     // set logging level
     switch(nconf.get('logging')) {
-      case "debug":
+
+      case 'debug':
         helpers.logging_threshold  = helpers.logging.debug;
         break;
 
-      case "warning"
+      case 'warning':
         helpers.logging_threshold  = helpers.logging.warning;
         break;
-        
+
       default:
         console.log('error: incorrect logging level in config.json - should be warning or debug!');
     }
 
+    helpers.logDebug('setup: hostname: ' + this.hostname + ' port: ' + this.port);
 
     // hipache/redis setup
     // ================
