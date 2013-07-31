@@ -25,13 +25,12 @@
                     .usage('Usage: ./app.js --cmd [push|status|help]')
                     .demand(['cmd'])
                     .argv;
-    var fs      = require('fs');
+    var fs         = require('fs');
     //var redis   = require("redis").createClient();
-    var http    = require('http');
-    var async   = require('async');
-
-    var nconf = require('nconf');
-
+    var http       = require('http');
+    var async      = require('async');
+    var nconf      = require('nconf');
+    var prettyjson = require('prettyjson');
 
     // Some general setup
     // ================
@@ -454,6 +453,8 @@
 
             this._containerID = argv.container;
             this._logs();
+            this._inspect();
+            console.log(prettyjson.render(this._settings));
             break;
 
         default:

@@ -17,7 +17,8 @@
     "optimist": "0.6.0",
     "async":"0.2.9",
     "helpersjs" : "0.1.2",
-    "nconf" : "0.6.7"
+    "nconf" : "0.6.7",
+    "prettyjson" : "0.8.1"
   },
   "devDependencies" : {
     "grunt": "0.4.1",
