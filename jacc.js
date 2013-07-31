@@ -21,12 +21,14 @@
 
     //var $       = require('jQuery');
     var helpers = require('helpersjs').create();
+
     var argv    = require('optimist')
                     .usage('Usage: ./app.js --cmd [push|status|help]')
                     .demand(['cmd'])
                     .argv;
+
     var fs         = require('fs');
-    var redis      = require("redis").createClient();
+    var redis      = require("redis");
     var http       = require('http');
     var async      = require('async');
     var nconf      = require('nconf');
@@ -63,26 +65,59 @@
     helpers.logDebug('setup: hostname: ' + this.hostname + ' port: ' + this.port);
 
 
-    // hipache/redis setup
-    // ================
-
-    // redis error management
-    redis.on("error", function (err) {
-        helpers.logErr("Error " + err);
-    });
-
-
     // Globals
     //==============
 
-    var  _imageID     = "",
-        _containerID = "",
-        _settings    = {};
+    var  _imageID      = "",
+        _containerID   = "",
+        _name          = "",
+        _containerPort,
+        _settings      = {};
 
 
-    // Functions
-    //==============
+    // hipache functions
+    //======================================================================
 
+    // hipache/redis setup
+    // -------------------------------------------------------------------------------------------------
+
+    // redis error management
+    redis.on("error", function (err) {
+        helpers.logErr("Redis error: " + err);
+    });
+
+    // build
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
+    //
+
+    this._updateRouter = function(asyncCallback){
+
+      var redis_client = redis.createClient();
+
+      redis_client.on("connect", function () {
+          redis_client.rpush("frontend:"+this._name, this._name, redis.print);
+
+          var backend = "http://"+this._settings.NetworkSettings.IPAddress+":"+this._containerPort;
+
+          redis_client.rpush("frontend:"+this._name, 
+                             backend, 
+                             redis.print);
+
+          redis_client.quit();
+
+          if(asyncCallback !== undefined) {
+            asyncCallback(null, 'updateRouter:'+ backend);
+          }
+
+      }.bind(this));
+
+    };
+
+
+    // Docker functions
+    //======================================================================
 
     // build
     //-------------------------------------------------------------------------------------------------
@@ -356,7 +391,6 @@
     };
 
 
-
     // inspect
     //-------------------------------------------------------------------------------------------------
     //
@@ -427,15 +461,13 @@
     this._close = function(asyncCallback){
 
       helpers.logDebug('close: Start...');
-
-      // close redis client
-      redis.quit();
  
       if(asyncCallback !== undefined) {
         asyncCallback(null, 'close completed');
       }
 
     };
+
 
     // push
     //-------------------------------------------------------------------------------------------------
@@ -446,6 +478,20 @@
     this.push = function(){
 
         helpers.logDebug('push: Start...');
+
+        if (argv.name === "" || argv.name === undefined) {
+          console.log('push requires the container name to be set - for instance --name=www.example.com!');
+          process.exit();        
+        }
+
+        this._name = argv.name;
+
+        if (argv.port === "" || argv.port === undefined) {
+          console.log('push requires the container port to be set - for instance --port=8080!');
+          process.exit();        
+        }
+
+        this._containerPort = argv.port;
 
         async.series([
             function(fn){ this._build(fn); }.bind(this),
@@ -473,12 +519,14 @@
     this.status = function(){
 
       helpers.logDebug('status: Start...');
-          if (argv.container === "" || argv.container === undefined) {
-            console.log('status requires the container parameter to be set!');
-            process.exit();        
+
+      if (argv.container === "" || argv.container === undefined) {
+        console.log('status requires the container parameter to be set!');
+        process.exit();        
       }
 
       this._containerID = argv.container;
+      this._name        = argv.name;
 
       async.series([
           function(fn){ this._inspect(fn); }.bind(this),
@@ -495,6 +543,7 @@
       });
     };
 
+
     // main
     //-------------------------------------------------------------------------------------------------
     //
@@ -506,7 +555,7 @@
             break;
 
         case "help":
-            console.log('--cmd push: webapp.tar in the current directory will be deployed to the cloud');
+            console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
             console.log('--cmd status --container=XXX: show logs for container');
             console.log('--help: show this message');
             break;
