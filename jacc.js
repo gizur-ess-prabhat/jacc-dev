@@ -464,6 +464,37 @@
     };
 
 
+    // status
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Show logs and settings
+    //
+
+    this.status = function(){
+
+      helpers.logDebug('status: Start...');
+          if (argv.container === "" || argv.container === undefined) {
+            console.log('status requires the container parameter to be set!');
+            process.exit();        
+      }
+
+      this._containerID = argv.container;
+
+      async.series([
+          function(fn){ this._inspect(fn); }.bind(this),
+          function(fn){ this._logs(fn); }.bind(this),
+          function(fn){ 
+            console.log(prettyjson.render(this._settings));
+            fn(null, 'settings printed');
+          }.bind(this),
+          function(fn){ this._close(fn); }.bind(this),
+      ],
+      function(err, results){
+        helpers.logDebug('status: results of async functions - ' + results);
+        helpers.logDebug('status: errors (if any) - ' + err);
+      });
+    };
+
     // main
     //-------------------------------------------------------------------------------------------------
     //
@@ -481,28 +512,7 @@
             break;
 
         case "status":
-            if (argv.container === "" || argv.container === undefined) {
-              console.log('status requires the container parameter to be set!');
-              process.exit();        
-            }
-
-            this._containerID = argv.container;
-
-            async.series([
-                function(fn){ this._inspect(fn); }.bind(this),
-                function(fn){ this._logs(fn); }.bind(this),
-                function(fn){ 
-                  console.log(prettyjson.render(this._settings));
-                  fn(null, 'settings printed');
-                }.bind(this),
-                function(fn){ this._close(fn); }.bind(this),
-            ],
-            function(err, results){
-              helpers.logDebug('status: results of async functions - ' + results);
-              helpers.logDebug('status: errors (if any) - ' + err);
-            });
-
-            
+            this.status();
             break;
 
         default:
