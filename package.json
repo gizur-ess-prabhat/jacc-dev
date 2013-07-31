@@ -3,6 +3,14 @@
   "private": true,
   "version": "0.0.1",
   "description": "Just another cloud in the cloud",
+  "homepage": "https://github.com/colmsjo/jacc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colmsjo/jacc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/colmsjo/jacc/issues"
+  },
   "author": "Jonas Colmsjö <jonas@gizur.com>",
   "dependencies": {
     "redis": "0.8.4",
@@ -17,5 +25,13 @@
     "grunt-contrib-uglify": "~0.2.2",
     "grunt-contrib-nodeunit":"~0.2.0",
     "doccoh":"0.4.1"
-  }
+  },
+  "keywords": [
+    "Private PaaS",
+    "Linux containers",
+    "LXC",
+    "Docker"
+  ],
+  "license": "WTFPL",
+  "preferGlobal": false
 }

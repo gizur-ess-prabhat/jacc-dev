@@ -11,7 +11,7 @@ module.exports = function(grunt) {
       tasks: 'default'
     },
     jshint: {
-      files: ['grunt.js', './*.js', 'test/**/*.js'],
+      files: ['./*.js', 'test/*.js'],
       options: {
         curly: true,
         eqeqeq: true,
@@ -34,7 +34,7 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'src/<%= pkg.name %>.js',
+        src: 'jacc.js',
         dest: 'build/<%= pkg.name %>.min.js'
       }
     },

@@ -245,7 +245,7 @@
 
         req.on('end', function(e) {
             helpers.logDebug('start: recieved end - ' + e.message);
-            http_req_ongoing = fasle;
+            http_req_ongoing = false;
         });
 
         helpers.logDebug('start: Data sent...');        
@@ -262,17 +262,17 @@
 
         helpers.logDebug('push: Start...');
 
-        this._build();
+        //this._build();
 
         // Run the async functions one by one
-        /*async.series([
-            function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
+        async.series([
+            //function(fn){ helpers.logDebug('main: running build()...'); fn(null, 'one');},
             function(fn){ this._build(); fn(null, 'one');},
-            function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
-            function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
+            //function(fn){ helpers.logDebug('main: build() finished...'); fn(null, 'one');},
+            //function(fn){ helpers.logDebug('main: running createContainer()...'); fn(null, 'one');},
             function(fn){ this._createContainer(); fn(null, 'one');},
-            function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
-        ]); */
+            //function(fn){ helpers.logDebug('main: createContainer() finished...'); fn(null, 'one');},
+        ]);
 
         helpers.logDebug('push: End of function, async processing will continue');
     };
