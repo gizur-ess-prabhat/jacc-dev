@@ -470,8 +470,8 @@
                 function(fn){ this._inspect(fn); }.bind(this),
                 function(fn){ this._logs(fn); }.bind(this),
                 function(fn){ 
-                  console.log(prettyjson.render(JSON.stringify(this._settings)));
-                  //console.log(JSON.stringify(this._settings));
+                  console.log(prettyjson.render(this._settings));
+                  console.log(JSON.stringify(this._settings));
                   fn(null, 'settings printed');
                 }.bind(this),
             ],
