@@ -86,7 +86,7 @@
           res.setEncoding('utf8');
 
           res.on('data', function (chunk) {
-            console.log('build: ' + chunk);
+            helpers.logInfo('build: ' + chunk);
 
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
@@ -175,7 +175,7 @@
             res.setEncoding('utf8');
 
             res.on('data', function (chunk) {
-                console.log('createContainer: ' + chunk);
+                helpers.logInfo('createContainer: ' + chunk);
 
                 // The result should look like this '{"Id":"c6bfd6da99d3"}'
                 this.container = JSON.parse(chunk).Id;            
@@ -217,7 +217,7 @@
         var options = {
           hostname: hostname,
           port: port,
-          path: '/containers/'+container+'/start',
+          path: '/containers/'+this.container+'/start',
           method: 'POST'
         };
 
@@ -228,7 +228,7 @@
           res.setEncoding('utf8');
 
           res.on('data', function (chunk) {
-            console.log('start: ' + chunk);
+            helpers.logInfo('start: ' + chunk);
           });
 
         });
