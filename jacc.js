@@ -217,7 +217,10 @@
 
         var options = {
           path: '/build',
-          method: 'POST'
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/tar',
+          }
         };
 
         this._dockerRemoteAPI(options, 
@@ -257,7 +260,10 @@
           hostname: this.hostname,
           port: this.port,
           path: '/build',
-          method: 'POST'
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/tar',
+          }
         };
 
         var req = http.request(options, function(res) {
