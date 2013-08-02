@@ -254,7 +254,7 @@
 
     this._build.old = function(asyncCallback){
 
-        helpers.logDebug('build: Start...');
+        helpers.logDebug('build.old: Start...');
 
         var options = {
           hostname: this.hostname,
@@ -266,38 +266,40 @@
           }
         };
 
+        helpers.logDebug('build:.old: options: ' + JSON.stringify(options));
+
         var req = http.request(options, function(res) {
-          helpers.logDebug('build: STATUS: ' + res.statusCode);
-          helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('build: options: ' + JSON.stringify(options));
+          helpers.logDebug('build.old: STATUS: ' + res.statusCode);
+          helpers.logDebug('build.old: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('build.old: options: ' + JSON.stringify(options));
 
           res.setEncoding('utf8');
 
           res.on('data', function (chunk) {
-            helpers.logInfo('build: ' + chunk);
+            helpers.logInfo('build.old: ' + chunk);
 
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
                 this._imageID = chunk.slice(19,31);
 
-                helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
+                helpers.logDebug('build.old: Build seams to be complete - image ID: ' + this._imageID );
             }
           }.bind(this));
 
           res.on('end', function () {
-            helpers.logDebug('build: res received end - image ID: ' + this._imageID);
+            helpers.logDebug('build.old: res received end - image ID: ' + this._imageID);
             asyncCallback(null, 'image:'+this._imageID);
           }.bind(this));
 
         }.bind(this));
 
         req.on('error', function(e) {
-            helpers.logErr('build: problem with request: ' + e.message);
+            helpers.logErr('build.old: problem with request: ' + e.message);
             process.exit();
         });
 
         req.on('end', function(e) {
-            helpers.logDebug('build: recieved end - : ' + e.message);
+            helpers.logDebug('build.old: recieved end - : ' + e.message);
         });
 
         // write data to the http.ClientRequest (which is a stream) returned by http.request() 
@@ -306,14 +308,14 @@
 
         // Close the request when the stream is closed
         stream.on('end', function() {
-          helpers.logDebug('build: stream received end');
+          helpers.logDebug('build.old: stream received end');
           req.end();
         });
 
         // send the data
         stream.pipe(req);
 
-        helpers.logDebug('build: Data sent...');
+        helpers.logDebug('build.old: Data sent...');
     };
 
 
