@@ -462,8 +462,6 @@
         }
 
         var options = {
-          hostname: this.hostname,
-          port:     this.port,
           path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
           method:   'POST',
           headers: {
@@ -471,36 +469,10 @@
           }
         };
 
-        var req = http.request(options, function(res) {
-          helpers.logDebug('logs: STATUS: ' + res.statusCode);
-          helpers.logDebug('logs: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('logs: options: ' + JSON.stringify(options));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
+        this._dockerRemoteAPI(options, function(chunk) {
             console.log('logs: ' + chunk);
-          });
-
-          res.on('end', function () {
-            helpers.logDebug('logs: res received end');
-            if(asyncCallback !== undefined) {
-              asyncCallback(null, 'logs completed');
-            }
-          });
-
-        }.bind(this));
-
-        req.on('error', function(e) {
-          helpers.logErr('logs: problem with request: ' + e.message);
-          process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('logs: recieved end - ' + e.message);
-        });
-
-        req.end();
+          },
+          asyncCallback);
 
         helpers.logDebug('logs: Data sent...');        
     };
