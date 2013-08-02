@@ -138,9 +138,10 @@
             for(key in keys) {
                 redis_client.lrange(key, 0,-1, redis.print);
             }
-          });
 
-          redis_client.quit();
+            redis_client.quit();
+
+          });
 
           helpers.logDebug('_proxyStatus: end');
 
