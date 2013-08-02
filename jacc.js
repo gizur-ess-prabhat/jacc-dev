@@ -161,7 +161,7 @@
     // Docker functions
     //======================================================================
 
-    this._dockerRemoteAPI = function(options, funcData, funcReq, asyncCallback){
+    this._dockerRemoteAPI = function(options, funcResData, funcResEnd, funcReq, asyncCallback){
 
         helpers.logDebug('_dockerRemoteAPI: Start...');
 
@@ -175,15 +175,18 @@
 
           res.setEncoding('utf8');
 
-          res.on('data', funcData.bind(this));
+          res.on('data', funcResData.bind(this));
 
-          res.on('end', function () {
-            helpers.logDebug('_dockerRemoteAPI: res received end');
-            if(asyncCallback !== undefined) {
-              asyncCallback(null, '_dockerRemoteAPI:');
-            }
-          }.bind(this));
-
+          if(funcResEnd !== null) {
+            res.on('end', funcResEnd.bind(this));
+          } else {
+            res.on('end', function () {
+              helpers.logDebug('_dockerRemoteAPI: res received end');
+              if(asyncCallback !== undefined) {
+                asyncCallback(null, '_dockerRemoteAPI:');
+              }
+            }.bind(this));
+          }
         }.bind(this));
 
         req.on('error', function(e) {
@@ -233,6 +236,16 @@
                 helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
             }
           }.bind(this),
+          function() {
+            if(this._imageID === "") {
+              helpers.logErr('Build failed! No image was created.');
+              process.exit();
+            }
+            helpers.logDebug('build: res received end - image ID: ' + this._imageID);
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'image:'+this._imageID);
+            }      
+          }.bind(this),
           function(req) {
             // write data to the http.ClientRequest (which is a stream) returned by http.request() 
             var fs = require('fs');
@@ -251,6 +264,318 @@
 
         helpers.logDebug('build: Data sent...');
     };
+
+
+    // createContainer
+    //-------------------------------------------------------------------------------------------------
+    //
+    // create a container with the new image
+    // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
+    // {"Id":"c6bfd6da99d3"}
+
+    this._createContainer = function(asyncCallback){
+
+        if (this._imageID === "") {
+          helpers.logErr('createContainer: this._imageID not set');
+          process.exit();        
+        }
+
+        var container = {
+         "Hostname":"",
+         "User":"",
+         "Memory":0,
+         "MemorySwap":0,
+         "AttachStdin":false,
+         "AttachStdout":true,
+         "AttachStderr":true,
+         "PortSpecs":null,
+         "Tty":false,
+         "OpenStdin":false,
+         "StdinOnce":false,
+         "Env":null,
+         "Dns":null,
+         "Image":this._imageID,
+         "Volumes":{},
+         "VolumesFrom":""
+        };
+
+        var options = {
+          path: '/containers/create',
+          method: 'POST'
+        };
+
+        helpers.logDebug('createContainer: Start...');
+
+        this._dockerRemoteAPI(options, 
+          function(chunk) {
+              helpers.logInfo('createContainer: ' + chunk);
+
+              // The result should look like this '{"Id":"c6bfd6da99d3"}'
+              this._containerID = JSON.parse(chunk).Id;            
+              helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
+          }.bind(this),
+          null,
+          function(req) {
+              helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
+              req.write(JSON.stringify(container));
+          }.bind(this),
+          asyncCallback);
+
+        helpers.logDebug('createContainer: Data sent...');
+   };
+
+
+    // start
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
+    //
+
+    this._start = function(asyncCallback){
+
+        helpers.logDebug('start: Start...');
+
+        if (this._containerID === "") {
+          helpers.logErr('start: this._containerID not set');
+          process.exit();        
+        }
+
+        var binds = {
+            "Binds":["/tmp:/tmp"]
+        };
+
+        var options = {
+          path:     '/containers/'+this._containerID+'/start',
+          method:   'POST'
+        };
+
+        helpers.logDebug('start: container - ' + this._containerID);
+
+        this._dockerRemoteAPI(options, 
+          function(chunk) {
+            helpers.logDebug('start: ' + chunk);
+          }.bind(this),
+          null,
+          function(req) {
+            helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
+            req.write(JSON.stringify(binds));
+          }.bind(this),
+          asyncCallback);
+
+        helpers.logDebug('start: Data sent...');        
+    };
+
+
+    // inspect
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -G http://localhost:4243/containers/c6bfd6da99d3/json
+    //
+
+    this._inspect = function(asyncCallback){
+        if (this._containerID === "") {
+          helpers.logErr('inspect: this._containerID not set');
+          process.exit();        
+        }
+
+        var options = {
+          path:     '/containers/'+this._containerID+'/json',
+          method:   'GET'
+        };
+
+        this._dockerRemoteAPI(options, function(chunk) {
+            this._settings = JSON.parse(chunk);
+        }.bind(this),
+        null,
+        null,
+        asyncCallback);
+    };
+
+
+    // inspect
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Get the logs of the started container (should show the current date since that's all the container does)
+    // Equivalent of: curl -H "Content-Type: application/vnd.docker.raw-stream" -d '' "http://localhost:4243/containers/c6bfd6da99d3/attach?logs=1&stream=0&stdout=1"
+    //
+
+    this._logs = function(asyncCallback){
+        if (this._containerID === "" || this._containerID === undefined) {
+          helpers.logErr('logs: this._containerID not set');
+          process.exit();        
+        }
+
+        var options = {
+          path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
+          method:   'POST',
+          headers: {
+            'Content-Type': 'application/vnd.docker.raw-stream',
+          }
+        };
+
+        this._dockerRemoteAPI(options, function(chunk) {
+            console.log('logs: ' + chunk);
+          },
+          null,
+          null,
+          asyncCallback);
+    };
+
+
+    // close
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Clenaup
+    //
+
+    this._close = function(asyncCallback){
+
+      helpers.logDebug('close: Start...');
+ 
+      if(asyncCallback !== undefined) {
+        asyncCallback(null, 'close completed');
+      }
+
+    };
+
+
+    // push
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Will build an images, create a container and start the container
+    //
+
+    this.push = function(){
+
+        helpers.logDebug('push: Start...');
+
+        if (argv.name === "" || argv.name === undefined) {
+          console.log('push requires the container name to be set - for instance --name=www.example.com!');
+          process.exit();        
+        }
+
+        this._name = argv.name;
+
+        if (argv.port === "" || argv.port === undefined) {
+          console.log('push requires the container port to be set - for instance --port=8080!');
+          process.exit();        
+        }
+
+        this._containerPort = argv.port;
+
+        async.series([
+            function(fn){ this._build(fn); }.bind(this),
+            function(fn){ this._createContainer(fn); }.bind(this),
+            function(fn){ this._start(fn); }.bind(this),
+            function(fn){ this._inspect(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this),
+            function(fn){ this._updateProxy(fn); }.bind(this),
+            function(fn){ this._close(fn); }.bind(this),
+        ],
+        function(err, results){
+          helpers.logDebug('push: results of async functions - ' + results);
+          helpers.logDebug('push: errors (if any) - ' + err);
+        });
+
+        helpers.logDebug('push: End of function, async processing will continue');
+    };
+
+
+    // status
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Show logs and settings
+    //
+
+    // status helper function
+    // curl -G http://localhost:4243/containers/json
+    this._containers = function(asyncCallback) {
+        helpers.logDebug('containers: Start...');
+
+        var options = {
+          path:     '/containers/json',
+          method:   'GET',
+        };
+
+        this._dockerRemoteAPI(options, function(chunk) {
+            var containers = JSON.parse(chunk);
+
+            containers.forEach(function(container) {
+              this._containerID = container.Id;
+              this._inspect(asyncCallback);
+              this._settings.NetworkSettings.IPAddress
+            });
+
+            console.log('containers: ' + prettyjson.render(containers));
+
+          },
+          null,
+          null,
+          asyncCallback);
+
+        helpers.logDebug('containers: End...');  
+    }
+
+    this.status = function(){
+
+      helpers.logDebug('status: Start...');
+
+      if (argv.container === "" || argv.container === undefined) {
+        async.series([
+            function(fn){ this._proxyStatus(fn); }.bind(this),
+            function(fn){ this._containers(fn); }.bind(this)
+        ]);
+      } else {
+
+        this._containerID = argv.container;
+        this._name        = argv.name;
+
+        async.series([
+            function(fn){ this._inspect(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this),
+            function(fn){ 
+              console.log(prettyjson.render(this._settings));
+              fn(null, 'settings printed');
+            }.bind(this)
+        ],
+        function(err, results){
+          helpers.logDebug('status: results of async functions - ' + results);
+          helpers.logDebug('status: errors (if any) - ' + err);
+        });
+      }
+    };
+
+
+    // main
+    //-------------------------------------------------------------------------------------------------
+    //
+
+    switch (argv.cmd) {
+
+        case "push":
+            this.push();
+            break;
+
+        case "help":
+            console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
+            console.log('--cmd status --container=XXX: show logs for container');
+            console.log('--help: show this message');
+            break;
+
+        case "status":
+            this.status();
+            break;
+
+        default:
+            console.log('No such command: ' + argv.cmd);
+
+    }
+
+
+    // to be cleaned up
+    //-------------------------------------------------------------------------------------------------
+    //
+
 
     this._build_old = function(asyncCallback){
 
@@ -322,15 +647,64 @@
         helpers.logDebug('build.old: Data sent...');
     };
 
+    this._start_old = function(asyncCallback){
 
-    // createContainer
-    //-------------------------------------------------------------------------------------------------
-    //
-    // create a container with the new image
-    // curl -H "Content-Type: application/json" -d @create.json http://localhost:4243/containers/create
-    // {"Id":"c6bfd6da99d3"}
+        helpers.logDebug('start: Start...');
 
-    this._createContainer = function(asyncCallback){
+        if (this._containerID === "") {
+          helpers.logErr('start: this._containerID not set');
+          process.exit();        
+        }
+
+        var binds = {
+            "Binds":["/tmp:/tmp"]
+        };
+
+        var options = {
+          hostname: this.hostname,
+          port:     this.port,
+          path:     '/containers/'+this._containerID+'/start',
+          method:   'POST'
+        };
+
+        helpers.logDebug('start: path - ' + options.path);
+        helpers.logDebug('start: container - ' + this._containerID);
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('start: STATUS: ' + res.statusCode);
+          helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('start: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('start: ' + chunk);
+          });
+
+          res.on('end', function () {
+            helpers.logDebug('start: res received end');
+            asyncCallback(null, 'start completed');
+          });
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('start: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('start: recieved end - ' + e.message);
+        });
+
+        helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
+        req.write(JSON.stringify(binds));
+        req.end();
+
+        helpers.logDebug('start: Data sent...');        
+    };
+
+    this._createContainer_old = function(asyncCallback){
 
         if (this._imageID === "") {
           helpers.logErr('createContainer: this._imageID not set');
@@ -402,272 +776,5 @@
 
         helpers.logDebug('createContainer: Data sent...');
    };
-
-
-    // start
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Equivalent of: curl -H "Content-Type: application/json" -d @start.json http://localhost:4243/containers/c6bfd6da99d3/start
-    //
-
-    this._start = function(asyncCallback){
-
-        helpers.logDebug('start: Start...');
-
-        if (this._containerID === "") {
-          helpers.logErr('start: this._containerID not set');
-          process.exit();        
-        }
-
-        var binds = {
-            "Binds":["/tmp:/tmp"]
-        };
-
-        var options = {
-          hostname: this.hostname,
-          port:     this.port,
-          path:     '/containers/'+this._containerID+'/start',
-          method:   'POST'
-        };
-
-        helpers.logDebug('start: path - ' + options.path);
-        helpers.logDebug('start: container - ' + this._containerID);
-
-        var req = http.request(options, function(res) {
-          helpers.logDebug('start: STATUS: ' + res.statusCode);
-          helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('start: options: ' + JSON.stringify(options));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
-            helpers.logInfo('start: ' + chunk);
-          });
-
-          res.on('end', function () {
-            helpers.logDebug('start: res received end');
-            asyncCallback(null, 'start completed');
-          });
-
-        }.bind(this));
-
-        req.on('error', function(e) {
-          helpers.logErr('start: problem with request: ' + e.message);
-          process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('start: recieved end - ' + e.message);
-        });
-
-        helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
-        req.write(JSON.stringify(binds));
-        req.end();
-
-        helpers.logDebug('start: Data sent...');        
-    };
-
-
-    // inspect
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Equivalent of: curl -G http://localhost:4243/containers/c6bfd6da99d3/json
-    //
-
-    this._inspect = function(asyncCallback){
-        if (this._containerID === "") {
-          helpers.logErr('inspect: this._containerID not set');
-          process.exit();        
-        }
-
-        var options = {
-          path:     '/containers/'+this._containerID+'/json',
-          method:   'GET'
-        };
-
-        this._dockerRemoteAPI(options, function(chunk) {
-            this._settings = JSON.parse(chunk);
-        }.bind(this),
-        null,
-        asyncCallback);
-    };
-
-
-    // inspect
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Get the logs of the started container (should show the current date since that's all the container does)
-    // Equivalent of: curl -H "Content-Type: application/vnd.docker.raw-stream" -d '' "http://localhost:4243/containers/c6bfd6da99d3/attach?logs=1&stream=0&stdout=1"
-    //
-
-    this._logs = function(asyncCallback){
-        if (this._containerID === "" || this._containerID === undefined) {
-          helpers.logErr('logs: this._containerID not set');
-          process.exit();        
-        }
-
-        var options = {
-          path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
-          method:   'POST',
-          headers: {
-            'Content-Type': 'application/vnd.docker.raw-stream',
-          }
-        };
-
-        this._dockerRemoteAPI(options, function(chunk) {
-            console.log('logs: ' + chunk);
-          },
-          null,
-          asyncCallback);
-    };
-
-
-    // close
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Clenaup
-    //
-
-    this._close = function(asyncCallback){
-
-      helpers.logDebug('close: Start...');
- 
-      if(asyncCallback !== undefined) {
-        asyncCallback(null, 'close completed');
-      }
-
-    };
-
-
-    // push
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Will build an images, create a container and start the container
-    //
-
-    this.push = function(){
-
-        helpers.logDebug('push: Start...');
-
-        if (argv.name === "" || argv.name === undefined) {
-          console.log('push requires the container name to be set - for instance --name=www.example.com!');
-          process.exit();        
-        }
-
-        this._name = argv.name;
-
-        if (argv.port === "" || argv.port === undefined) {
-          console.log('push requires the container port to be set - for instance --port=8080!');
-          process.exit();        
-        }
-
-        this._containerPort = argv.port;
-
-        async.series([
-            function(fn){ this._build_old(fn); }.bind(this),
-            function(fn){ this._createContainer(fn); }.bind(this),
-            function(fn){ this._start(fn); }.bind(this),
-            function(fn){ this._inspect(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ this._updateProxy(fn); }.bind(this),
-            function(fn){ this._close(fn); }.bind(this),
-        ],
-        function(err, results){
-          helpers.logDebug('push: results of async functions - ' + results);
-          helpers.logDebug('push: errors (if any) - ' + err);
-        });
-
-        helpers.logDebug('push: End of function, async processing will continue');
-    };
-
-
-    // status
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Show logs and settings
-    //
-
-    // status helper function
-    // curl -G http://localhost:4243/containers/json
-    this._containers = function(asyncCallback) {
-        helpers.logDebug('containers: Start...');
-
-        var options = {
-          path:     '/containers/json',
-          method:   'GET',
-        };
-
-        this._dockerRemoteAPI(options, function(chunk) {
-            var containers = JSON.parse(chunk);
-
-            containers.forEach(function(container) {
-              this._containerID = container.Id;
-              this._inspect(asyncCallback);
-              this._settings.NetworkSettings.IPAddress
-            });
-
-            console.log('containers: ' + prettyjson.render(containers));
-
-          },
-          null,
-          asyncCallback);
-
-        helpers.logDebug('containers: End...');  
-    }
-
-    this.status = function(){
-
-      helpers.logDebug('status: Start...');
-
-      if (argv.container === "" || argv.container === undefined) {
-        async.series([
-            function(fn){ this._proxyStatus(fn); }.bind(this),
-            function(fn){ this._containers(fn); }.bind(this)
-        ]);
-      } else {
-
-        this._containerID = argv.container;
-        this._name        = argv.name;
-
-        async.series([
-            function(fn){ this._inspect(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ 
-              console.log(prettyjson.render(this._settings));
-              fn(null, 'settings printed');
-            }.bind(this)
-        ],
-        function(err, results){
-          helpers.logDebug('status: results of async functions - ' + results);
-          helpers.logDebug('status: errors (if any) - ' + err);
-        });
-      }
-    };
-
-
-    // main
-    //-------------------------------------------------------------------------------------------------
-    //
-
-    switch (argv.cmd) {
-
-        case "push":
-            this.push();
-            break;
-
-        case "help":
-            console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
-            console.log('--cmd status --container=XXX: show logs for container');
-            console.log('--help: show this message');
-            break;
-
-        case "status":
-            this.status();
-            break;
-
-        default:
-            console.log('No such command: ' + argv.cmd);
-
-    }
 
 }());
