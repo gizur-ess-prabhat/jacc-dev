@@ -266,8 +266,8 @@
           }
         };
 
-        /*options2.hostname = this.hostname;
-        options2.port = this.port;*/
+        options2.hostname = this.hostname;
+        options2.port = this.port;
 
 
         helpers.logDebug('build.old: options2: ' + JSON.stringify(options2));
