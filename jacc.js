@@ -95,7 +95,7 @@
 
           var backend = "http://"+this._settings.NetworkSettings.IPAddress+":"+this._containerPort;
 
-          redis_client.rpush("frontend:"+this._name, 
+          redis_client.rpush("frontend:"+this._containerID, 
                              backend, 
                              redis.print);
 
@@ -438,7 +438,7 @@
             this._settings = JSON.parse(chunk);
             helpers.logInfo('inspect: ' + this._settings);
             helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
-        });
+        }.bind(this));
 
         helpers.logDebug('inspect: Data sent...');        
     };
@@ -582,7 +582,15 @@
 
         this._dockerRemoteAPI(options, function(chunk) {
             var containers = JSON.parse(chunk);
+
+            containers.forEach(function(container) {
+              this._containerID = container.Id;
+              this._inspect(asyncCallback);
+              this._settings.NetworkSettings.IPAddress
+            });
+
             console.log('containers: ' + prettyjson.render(containers));
+
         });
 
         helpers.logDebug('containers: End...');  
