@@ -616,7 +616,7 @@
             console.log('containers: ' + chunk);
           });
 
-        })
+        });
 
         helpers.logDebug('containers: End...');  
     }
