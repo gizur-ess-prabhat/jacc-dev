@@ -257,8 +257,6 @@
         helpers.logDebug('build.old: Start...');
 
         var options = {
-          hostname: this.hostname,
-          port: this.port,
           path: '/build',
           method: 'POST',
           headers: {
@@ -266,7 +264,11 @@
           }
         };
 
-        helpers.logDebug('build:.old: options: ' + JSON.stringify(options));
+        options.hostname = this.hostname;
+        options.port = this.port;
+
+
+        helpers.logDebug('build.old: options: ' + JSON.stringify(options));
 
         var req = http.request(options, function(res) {
           helpers.logDebug('build.old: STATUS: ' + res.statusCode);
