@@ -53,10 +53,20 @@ vagrant up aws
 Troubleshooting
 ---------------
 
-hipache is configured through a redis database. Make sure that redis is running (assuming 
+Q: hipache can't conntect to redis database
+A: hipache is configured through a redis database. Make sure that redis is running (assuming 
 it already is installed): `sudo service redis-server status`
 
-When using vagrant, run the bootstrap.sh script manually after the machine has been created.
-The kernel upgrade stops the execution of the script so the rest need to be executed once
+
+Q: Installation has not been completed with `vagrant up vb`
+A: When using vagrant, run the bootstrap.sh script manually after the machine has been created.
+The kernel upgrade stops the execution of the script so the rest need`s to be executed once
 more.
 
+Q: Can't find the jacc folder after reboot
+A: Clone the repo manually:
+```
+cd ~
+git clone https://github.com/colmsjo/jacc.git
+cd jacc && sudo npm install --production
+```
