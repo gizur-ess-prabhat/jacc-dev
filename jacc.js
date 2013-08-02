@@ -256,7 +256,7 @@
 
         helpers.logDebug('build.old: Start...');
 
-        var options = {
+        var options2 = {
           path: '/build',
           method: 'POST',
           headers: {
@@ -264,16 +264,16 @@
           }
         };
 
-        options.hostname = this.hostname;
-        options.port = this.port;
+        options2.hostname = this.hostname;
+        options2.port = this.port;
 
 
-        helpers.logDebug('build.old: options: ' + JSON.stringify(options));
+        helpers.logDebug('build.old: options2: ' + JSON.stringify(options2));
 
-        var req = http.request(options, function(res) {
+        var req = http.request(options2, function(res) {
           helpers.logDebug('build.old: STATUS: ' + res.statusCode);
           helpers.logDebug('build.old: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('build.old: options: ' + JSON.stringify(options));
+          helpers.logDebug('build.old: options: ' + JSON.stringify(options2));
 
           res.setEncoding('utf8');
 
