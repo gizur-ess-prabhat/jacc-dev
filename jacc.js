@@ -131,13 +131,13 @@
 
       redis_client.on("connect", function () {
 
-          redis_client.keys("*", function(err, keys) {
+          redis_client.keys("frontend*", function(err, keys) {
 
             helpers.logDebug('_proxyStatus: redis keys - ' + keys);
 
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
-                  console.log(key+' - '+res);
+                  console.log(key+' - backend:'+res);
                 });
             });
 
