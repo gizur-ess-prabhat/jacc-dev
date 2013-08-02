@@ -227,11 +227,9 @@
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
                 this._imageID = chunk.slice(19,31);
-
                 helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
             }
-
-          },
+          }.bind(this),
           function(req) {
             // write data to the http.ClientRequest (which is a stream) returned by http.request() 
             var fs = require('fs');
@@ -245,7 +243,7 @@
 
             // send the data
             stream.pipe(req);
-          },
+          }.bind(this),
           asyncCallback);
 
         helpers.logDebug('build: Data sent...');
@@ -311,6 +309,8 @@
 
         helpers.logDebug('build: Data sent...');
     };
+
+
     // createContainer
     //-------------------------------------------------------------------------------------------------
     //
