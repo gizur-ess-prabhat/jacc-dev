@@ -78,10 +78,10 @@
     // hipache functions
     //======================================================================
 
-    // build
+    // updateProxy
     //-------------------------------------------------------------------------------------------------
     //
-    // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
+    // Add both frontend and backend to proxy
     //
 
     this._updateProxy = function(asyncCallback){
@@ -116,6 +116,13 @@
 
     };
 
+
+    // proxyStatus
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Print contents of redis database
+    //
+
     this._proxyStatus = function(asyncCallback){
 
       helpers.logDebug('_proxyStatus: Start...');
@@ -125,6 +132,9 @@
       redis_client.on("connect", function () {
 
           redis_client.keys("*", function(keys) {
+
+            helpers.logDebug('_proxyStatus: redis keys - ' + keys);
+
             for(key in keys) {
                 redis_client.lrange(key, 0,-1, redis.print);
             }
@@ -552,7 +562,6 @@
     this.status = function(){
 
       helpers.logDebug('status: Start...');
-
 
       if (argv.container === "" || argv.container === undefined) {
         this._proxyStatus();
