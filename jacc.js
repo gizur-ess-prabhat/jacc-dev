@@ -439,140 +439,6 @@
 
     };
 
-
-    // push
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Will build an images, create a container and start the container
-    //
-
-    this.push = function(){
-
-        helpers.logDebug('push: Start...');
-
-        if (argv.name === "" || argv.name === undefined) {
-          console.log('push requires the container name to be set - for instance --name=www.example.com!');
-          process.exit();        
-        }
-
-        this._name = argv.name;
-
-        if (argv.port === "" || argv.port === undefined) {
-          console.log('push requires the container port to be set - for instance --port=8080!');
-          process.exit();        
-        }
-
-        this._containerPort = argv.port;
-
-        async.series([
-            function(fn){ this._build_old(fn); }.bind(this),
-            function(fn){ this._createContainer(fn); }.bind(this),
-            function(fn){ this._start(fn); }.bind(this),
-            function(fn){ this._inspect(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ this._updateProxy(fn); }.bind(this),
-            function(fn){ this._close(fn); }.bind(this),
-        ],
-        function(err, results){
-          helpers.logDebug('push: results of async functions - ' + results);
-          helpers.logDebug('push: errors (if any) - ' + err);
-        });
-
-        helpers.logDebug('push: End of function, async processing will continue');
-    };
-
-
-    // status
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Show logs and settings
-    //
-
-    // status helper function
-    // curl -G http://localhost:4243/containers/json
-    this._containers = function(asyncCallback) {
-        helpers.logDebug('containers: Start...');
-
-        var options = {
-          path:     '/containers/json',
-          method:   'GET',
-        };
-
-        this._dockerRemoteAPI(options, function(chunk) {
-            var containers = JSON.parse(chunk);
-
-            containers.forEach(function(container) {
-              this._containerID = container.Id;
-              this._inspect(asyncCallback);
-              this._settings.NetworkSettings.IPAddress
-            });
-
-            console.log('containers: ' + prettyjson.render(containers));
-
-          },
-          null,
-          null,
-          asyncCallback);
-
-        helpers.logDebug('containers: End...');  
-    }
-
-    this.status = function(){
-
-      helpers.logDebug('status: Start...');
-
-      if (argv.container === "" || argv.container === undefined) {
-        async.series([
-            function(fn){ this._proxyStatus(fn); }.bind(this),
-            function(fn){ this._containers(fn); }.bind(this)
-        ]);
-      } else {
-
-        this._containerID = argv.container;
-        this._name        = argv.name;
-
-        async.series([
-            function(fn){ this._inspect(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ 
-              console.log(prettyjson.render(this._settings));
-              fn(null, 'settings printed');
-            }.bind(this)
-        ],
-        function(err, results){
-          helpers.logDebug('status: results of async functions - ' + results);
-          helpers.logDebug('status: errors (if any) - ' + err);
-        });
-      }
-    };
-
-
-    // main
-    //-------------------------------------------------------------------------------------------------
-    //
-
-    switch (argv.cmd) {
-
-        case "push":
-            this.push();
-            break;
-
-        case "help":
-            console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
-            console.log('--cmd status --container=XXX: show logs for container');
-            console.log('--help: show this message');
-            break;
-
-        case "status":
-            this.status();
-            break;
-
-        default:
-            console.log('No such command: ' + argv.cmd);
-
-    }
-
-
     // to be cleaned up
     //-------------------------------------------------------------------------------------------------
     //
@@ -777,5 +643,137 @@
 
         helpers.logDebug('createContainer: Data sent...');
    };
+    // push
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Will build an images, create a container and start the container
+    //
+
+    this.push = function(){
+
+        helpers.logDebug('push: Start...');
+
+        if (argv.name === "" || argv.name === undefined) {
+          console.log('push requires the container name to be set - for instance --name=www.example.com!');
+          process.exit();        
+        }
+
+        this._name = argv.name;
+
+        if (argv.port === "" || argv.port === undefined) {
+          console.log('push requires the container port to be set - for instance --port=8080!');
+          process.exit();        
+        }
+
+        this._containerPort = argv.port;
+
+        async.series([
+            function(fn){ this._build_old(fn); }.bind(this),
+            function(fn){ this._createContainer(fn); }.bind(this),
+            function(fn){ this._start(fn); }.bind(this),
+            function(fn){ this._inspect(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this),
+            function(fn){ this._updateProxy(fn); }.bind(this),
+            function(fn){ this._close(fn); }.bind(this),
+        ],
+        function(err, results){
+          helpers.logDebug('push: results of async functions - ' + results);
+          helpers.logDebug('push: errors (if any) - ' + err);
+        });
+
+        helpers.logDebug('push: End of function, async processing will continue');
+    };
+
+
+    // status
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Show logs and settings
+    //
+
+    // status helper function
+    // curl -G http://localhost:4243/containers/json
+    this._containers = function(asyncCallback) {
+        helpers.logDebug('containers: Start...');
+
+        var options = {
+          path:     '/containers/json',
+          method:   'GET',
+        };
+
+        this._dockerRemoteAPI(options, function(chunk) {
+            var containers = JSON.parse(chunk);
+
+            containers.forEach(function(container) {
+              this._containerID = container.Id;
+              this._inspect(asyncCallback);
+              this._settings.NetworkSettings.IPAddress
+            });
+
+            console.log('containers: ' + prettyjson.render(containers));
+
+          },
+          null,
+          null,
+          asyncCallback);
+
+        helpers.logDebug('containers: End...');  
+    }
+
+    this.status = function(){
+
+      helpers.logDebug('status: Start...');
+
+      if (argv.container === "" || argv.container === undefined) {
+        async.series([
+            function(fn){ this._proxyStatus(fn); }.bind(this),
+            function(fn){ this._containers(fn); }.bind(this)
+        ]);
+      } else {
+
+        this._containerID = argv.container;
+        this._name        = argv.name;
+
+        async.series([
+            function(fn){ this._inspect(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this),
+            function(fn){ 
+              console.log(prettyjson.render(this._settings));
+              fn(null, 'settings printed');
+            }.bind(this)
+        ],
+        function(err, results){
+          helpers.logDebug('status: results of async functions - ' + results);
+          helpers.logDebug('status: errors (if any) - ' + err);
+        });
+      }
+    };
+
+
+    // main
+    //-------------------------------------------------------------------------------------------------
+    //
+
+    switch (argv.cmd) {
+
+        case "push":
+            this.push();
+            break;
+
+        case "help":
+            console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
+            console.log('--cmd status --container=XXX: show logs for container');
+            console.log('--help: show this message');
+            break;
+
+        case "status":
+            this.status();
+            break;
+
+        default:
+            console.log('No such command: ' + argv.cmd);
+
+    }
+
 
 }());
