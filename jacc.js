@@ -623,8 +623,7 @@
             function(fn){ 
               console.log(prettyjson.render(this._settings));
               fn(null, 'settings printed');
-            }.bind(this),
-            function(fn){ this._close(fn); }.bind(this),
+            }.bind(this)
         ],
         function(err, results){
           helpers.logDebug('status: results of async functions - ' + results);
