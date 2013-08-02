@@ -84,9 +84,9 @@
     // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
     //
 
-    this._updateRouter = function(asyncCallback){
+    this._updateProxy = function(asyncCallback){
 
-      helpers.logDebug('updateRouter: Start...');
+      helpers.logDebug('updateProxy: Start...');
 
       var redis_client = redis.createClient();
 
@@ -101,10 +101,41 @@
 
           redis_client.quit();
 
-          helpers.logDebug('updateRouter: backend - ' + backend);
+          helpers.logDebug('updateProxy: backend - ' + backend);
 
           if(asyncCallback !== undefined) {
-            asyncCallback(null, 'updateRouter:'+ backend);
+            asyncCallback(null, 'updateProxy:'+ backend);
+          }
+
+      }.bind(this));
+
+      // redis error management
+      redis_client.on("error", function (err) {
+          helpers.logErr("Redis error: " + err);
+      });
+
+    };
+
+    this._proxyStatus = function(asyncCallback){
+
+      helpers.logDebug('_proxyStatus: Start...');
+
+      var redis_client = redis.createClient();
+
+      redis_client.on("connect", function () {
+
+          redis_client.keys("*", function(keys) {
+            for(key in keys) {
+                redis_client.lrange(key, 0,-1, redis.print);
+            }
+          });
+
+          redis_client.quit();
+
+          helpers.logDebug('_proxyStatus: end');
+
+          if(asyncCallback !== undefined) {
+            asyncCallback(null, '_proxyStatus completed');
           }
 
       }.bind(this));
@@ -500,7 +531,7 @@
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ this._updateRouter(fn); }.bind(this),
+            function(fn){ this._updateProxy(fn); }.bind(this),
             function(fn){ this._close(fn); }.bind(this),
         ],
         function(err, results){
@@ -521,6 +552,8 @@
     this.status = function(){
 
       helpers.logDebug('status: Start...');
+
+      this._proxyStatus();
 
       if (argv.container === "" || argv.container === undefined) {
         console.log('status requires the container parameter to be set!');
