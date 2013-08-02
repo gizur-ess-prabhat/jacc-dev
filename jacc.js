@@ -238,7 +238,7 @@
             }
           }.bind(this),
           function() {
-            if(this._imageID === "") {
+            if(this._imageID === "" || this._imageID === undefined) {
               helpers.logErr('Build failed! No image was created.');
               process.exit();
             }
