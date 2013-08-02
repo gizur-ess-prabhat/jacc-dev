@@ -256,7 +256,7 @@
             stream.on('end', function() {
               helpers.logDebug('build: stream received end');
               req.end();
-            });
+            }.bind(this));
 
             // send the data
             stream.pipe(req);
