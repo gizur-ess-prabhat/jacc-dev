@@ -433,44 +433,15 @@
         }
 
         var options = {
-          hostname: this.hostname,
-          port:     this.port,
           path:     '/containers/'+this._containerID+'/json',
           method:   'GET'
         };
 
-        var req = http.request(options, function(res) {
-          helpers.logDebug('inspect: STATUS: ' + res.statusCode);
-          helpers.logDebug('inspect: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('inspect: options: ' + JSON.stringify(options));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
+        this._dockerRemoteAPI(options, function(chunk) {
             this._settings = JSON.parse(chunk);
             helpers.logInfo('inspect: ' + this._settings);
             helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
-          }.bind(this));
-
-          res.on('end', function () {
-            helpers.logDebug('inspect: res received end');
-            if(asyncCallback !== undefined) {
-              asyncCallback(null, 'inspect:'+ this._settings.NetworkSettings.IPAddress);
-            }
-          }.bind(this));
-
-        }.bind(this));
-
-        req.on('error', function(e) {
-          helpers.logErr('inspect: problem with request: ' + e.message);
-          process.exit();
         });
-
-        req.on('end', function(e) {
-            helpers.logDebug('inspect: recieved end - ' + e.message);
-        });
-
-        req.end();
 
         helpers.logDebug('inspect: Data sent...');        
     };
@@ -612,8 +583,8 @@
           method:   'GET',
         };
 
-        this._dockerRemoteAPI(options, function(chunk) {
-            console.log('containers: ' + chunk);
+        this._dockerRemoteAPI(options, function(containers) {
+            console.log('containers: ' + prettyjson.render(containers)));
         });
 
         helpers.logDebug('containers: End...');  
@@ -624,10 +595,10 @@
       helpers.logDebug('status: Start...');
 
       if (argv.container === "" || argv.container === undefined) {
-        this._proxyStatus();
-        this._containers();
-        //console.log('status requires the container parameter to be set!');
-        //process.exit();     
+        async.series([
+            function(fn){ this._proxyStatus(fn); }.bind(this),
+            function(fn){ this._containers(fn); }.bind(this)
+        ]);
       } else {
 
         this._containerID = argv.container;
