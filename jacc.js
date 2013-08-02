@@ -438,7 +438,8 @@
             this._settings = JSON.parse(chunk);
             //console.log(prettyjson.render(this._settings));
             helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
-        }.bind(this));
+        }.bind(this),
+        asyncCallback);
 
         helpers.logDebug('inspect: Data sent...');        
     };
@@ -591,7 +592,8 @@
 
             console.log('containers: ' + prettyjson.render(containers));
 
-        });
+          },
+          asyncCallback);
 
         helpers.logDebug('containers: End...');  
     }
