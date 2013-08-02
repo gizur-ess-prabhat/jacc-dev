@@ -252,7 +252,7 @@
         helpers.logDebug('build: Data sent...');
     };
 
-    this._build.old = function(asyncCallback){
+    this._build_old = function(asyncCallback){
 
         helpers.logDebug('build.old: Start...');
 
@@ -266,8 +266,8 @@
           }
         };
 
-        options2.hostname = this.hostname;
-        options2.port = this.port;
+        /*options2.hostname = this.hostname;
+        options2.port = this.port;*/
 
 
         helpers.logDebug('build.old: options2: ' + JSON.stringify(options2));
@@ -564,7 +564,7 @@
         this._containerPort = argv.port;
 
         async.series([
-            function(fn){ this._build.old(fn); }.bind(this),
+            function(fn){ this._build_old(fn); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
