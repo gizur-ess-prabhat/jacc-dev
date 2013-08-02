@@ -436,7 +436,7 @@
 
         this._dockerRemoteAPI(options, function(chunk) {
             this._settings = JSON.parse(chunk);
-            console.log(prettyjson.render(this._settings));
+            //console.log(prettyjson.render(this._settings));
             helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
         }.bind(this));
 
