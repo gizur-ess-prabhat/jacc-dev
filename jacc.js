@@ -132,9 +132,6 @@
       redis_client.on("connect", function () {
 
           redis_client.keys("frontend*", function(err, keys) {
-
-            helpers.logDebug('_proxyStatus: redis keys - ' + keys);
-
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
                   console.log(key+' - backend:'+res);
@@ -143,13 +140,13 @@
 
             redis_client.quit();
 
+            helpers.logDebug('_proxyStatus: end');
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, '_proxyStatus completed');
+            }
+
           });
 
-          helpers.logDebug('_proxyStatus: end');
-
-          if(asyncCallback !== undefined) {
-            asyncCallback(null, '_proxyStatus completed');
-          }
 
       }.bind(this));
 
@@ -583,7 +580,8 @@
           method:   'GET',
         };
 
-        this._dockerRemoteAPI(options, function(containers) {
+        this._dockerRemoteAPI(options, function(chunk) {
+            var containers = JSON.parse(chunk);
             console.log('containers: ' + prettyjson.render(containers));
         });
 
