@@ -257,6 +257,8 @@
         helpers.logDebug('build.old: Start...');
 
         var options2 = {
+          hostname: '',
+          port: 0,
           path: '/build',
           method: 'POST',
           headers: {
