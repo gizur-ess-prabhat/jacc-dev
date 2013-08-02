@@ -216,21 +216,13 @@
         helpers.logDebug('build: Start...');
 
         var options = {
-          hostname: this.hostname,
-          port: this.port,
           path: '/build',
           method: 'POST'
         };
 
-        var req = http.request(options, function(res) {
-          helpers.logDebug('build: STATUS: ' + res.statusCode);
-          helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('build: options: ' + JSON.stringify(options));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
-            helpers.logInfo('build: ' + chunk);
+        this._dockerRemoteAPI(options, 
+          function(chunk) {
+            helpers.logDebug('build: ' + chunk);
 
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
@@ -238,36 +230,23 @@
 
                 helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
             }
-          }.bind(this));
 
-          res.on('end', function () {
-            helpers.logDebug('build: res received end - image ID: ' + this._imageID);
-            asyncCallback(null, 'image:'+this._imageID);
-          }.bind(this));
+          },
+          function(req) {
+            // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+            var fs = require('fs');
+            var stream = fs.createReadStream('webapp.tar');
 
-        }.bind(this));
+            // Close the request when the stream is closed
+            stream.on('end', function() {
+              helpers.logDebug('build: stream received end');
+              req.end();
+            });
 
-        req.on('error', function(e) {
-            helpers.logErr('build: problem with request: ' + e.message);
-            process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('build: recieved end - : ' + e.message);
-        });
-
-        // write data to the http.ClientRequest (which is a stream) returned by http.request() 
-        var fs = require('fs');
-        var stream = fs.createReadStream('webapp.tar');
-
-        // Close the request when the stream is closed
-        stream.on('end', function() {
-          helpers.logDebug('build: stream received end');
-          req.end();
-        });
-
-        // send the data
-        stream.pipe(req);
+            // send the data
+            stream.pipe(req);
+          },
+          asyncCallback);
 
         helpers.logDebug('build: Data sent...');
     };
