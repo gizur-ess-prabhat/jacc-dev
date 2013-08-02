@@ -584,7 +584,7 @@
         };
 
         this._dockerRemoteAPI(options, function(containers) {
-            console.log('containers: ' + prettyjson.render(containers)));
+            console.log('containers: ' + prettyjson.render(containers));
         });
 
         helpers.logDebug('containers: End...');  
