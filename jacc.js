@@ -562,14 +562,62 @@
     // Show logs and settings
     //
 
+    // status helper function
+    // curl -G http://localhost:4243/containers/json
+    this._containers = function(asyncCallback) {
+        helpers.logDebug('containers: Start...');
+
+        var options = {
+          hostname: this.hostname,
+          port:     this.port,
+          path:     '/containers/json',
+          method:   'GET',
+        };
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('containers: STATUS: ' + res.statusCode);
+          helpers.logDebug('containers: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('containers: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('containers: ' + chunk);
+          });
+
+          res.on('end', function () {
+            helpers.logDebug('containers: res received end');
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'containers completed');
+            }
+          });
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('containers: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('containers: recieved end - ' + e.message);
+        });
+
+        req.end();
+
+        helpers.logDebug('containers: Data sent...');  
+
+    }
+
     this.status = function(){
 
       helpers.logDebug('status: Start...');
 
       if (argv.container === "" || argv.container === undefined) {
         this._proxyStatus();
+        this._containers();
         //console.log('status requires the container parameter to be set!');
-        //process.exit();        
+        //process.exit();     
       } else {
 
         this._containerID = argv.container;
