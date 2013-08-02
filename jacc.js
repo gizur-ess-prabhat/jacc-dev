@@ -168,10 +168,11 @@
         options.hostname = this.hostname;
         options.port     = this.port;
 
+        helpers.logDebug('_dockerRemoteAPI: options: ' + JSON.stringify(options));
+
         var req = http.request(options, function(res) {
           helpers.logDebug('_dockerRemoteAPI: STATUS: ' + res.statusCode);
           helpers.logDebug('_dockerRemoteAPI: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('_dockerRemoteAPI: options: ' + JSON.stringify(options));
 
           res.setEncoding('utf8');
 
