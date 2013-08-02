@@ -614,8 +614,6 @@
 
         this._dockerRemoteAPI(options, function(chunk) {
             console.log('containers: ' + chunk);
-          });
-
         });
 
         helpers.logDebug('containers: End...');  
