@@ -552,7 +552,7 @@
         this._containerPort = argv.port;
 
         async.series([
-            function(fn){ this._build(fn); }.bind(this),
+            function(fn){ this._build.old(fn); }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
