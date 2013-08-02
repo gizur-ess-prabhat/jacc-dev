@@ -164,6 +164,46 @@
     // Docker functions
     //======================================================================
 
+    this._dockerRemoteAPI = function(options, funcData, asyncCallback){
+
+        helpers.logDebug('_dockerRemoteAPI: Start...');
+
+        options.hostname = this.hostname;
+        options.port     = this.port,;
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('_dockerRemoteAPI: STATUS: ' + res.statusCode);
+          helpers.logDebug('_dockerRemoteAPI: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('_dockerRemoteAPI: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', funcData.bind(this));
+
+          res.on('end', function () {
+            helpers.logDebug('_dockerRemoteAPI: res received end');
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, '_dockerRemoteAPI:');
+            }
+          }.bind(this));
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('_dockerRemoteAPI: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('_dockerRemoteAPI: recieved end - ' + e.message);
+        });
+
+        req.end();
+
+        helpers.logDebug('_dockerRemoteAPI: Data sent...');        
+    };
+
+
     // build
     //-------------------------------------------------------------------------------------------------
     //
@@ -470,7 +510,7 @@
           res.setEncoding('utf8');
 
           res.on('data', function (chunk) {
-            helpers.logInfo('logs: ' + chunk);
+            console.log('logs: ' + chunk);
           });
 
           res.on('end', function () {
@@ -568,45 +608,17 @@
         helpers.logDebug('containers: Start...');
 
         var options = {
-          hostname: this.hostname,
-          port:     this.port,
           path:     '/containers/json',
           method:   'GET',
         };
 
-        var req = http.request(options, function(res) {
-          helpers.logDebug('containers: STATUS: ' + res.statusCode);
-          helpers.logDebug('containers: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('containers: options: ' + JSON.stringify(options));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
-            helpers.logInfo('containers: ' + chunk);
+        this._dockerRemoteAPI(options, function(chunk) {
+            console.log('containers: ' + chunk);
           });
 
-          res.on('end', function () {
-            helpers.logDebug('containers: res received end');
-            if(asyncCallback !== undefined) {
-              asyncCallback(null, 'containers completed');
-            }
-          });
+        })
 
-        }.bind(this));
-
-        req.on('error', function(e) {
-          helpers.logErr('containers: problem with request: ' + e.message);
-          process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('containers: recieved end - ' + e.message);
-        });
-
-        req.end();
-
-        helpers.logDebug('containers: Data sent...');  
-
+        helpers.logDebug('containers: End...');  
     }
 
     this.status = function(){
