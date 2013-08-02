@@ -169,7 +169,7 @@
         helpers.logDebug('_dockerRemoteAPI: Start...');
 
         options.hostname = this.hostname;
-        options.port     = this.port,;
+        options.port     = this.port;
 
         var req = http.request(options, function(res) {
           helpers.logDebug('_dockerRemoteAPI: STATUS: ' + res.statusCode);
