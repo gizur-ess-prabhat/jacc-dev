@@ -500,8 +500,8 @@
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ this._close(fn); }.bind(this),
             function(fn){ this._updateRouter(fn); }.bind(this),
+            function(fn){ this._close(fn); }.bind(this),
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
