@@ -161,7 +161,7 @@
     // Docker functions
     //======================================================================
 
-    this._dockerRemoteAPI = function(options, funcData, asyncCallback){
+    this._dockerRemoteAPI = function(options, funcData, funcReq, asyncCallback){
 
         helpers.logDebug('_dockerRemoteAPI: Start...');
 
@@ -194,6 +194,10 @@
         req.on('end', function(e) {
             helpers.logDebug('_dockerRemoteAPI: recieved end - ' + e.message);
         });
+
+        if(funcReq !== null) {
+          funcReq(req);
+        }
 
         req.end();
 
@@ -268,7 +272,66 @@
         helpers.logDebug('build: Data sent...');
     };
 
+    this._build.old = function(asyncCallback){
 
+        helpers.logDebug('build: Start...');
+
+        var options = {
+          hostname: this.hostname,
+          port: this.port,
+          path: '/build',
+          method: 'POST'
+        };
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('build: STATUS: ' + res.statusCode);
+          helpers.logDebug('build: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('build: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('build: ' + chunk);
+
+            // The last row looks like this 'Successfully built 3df239699c83'
+            if (chunk.slice(0,18) === 'Successfully built') {
+                this._imageID = chunk.slice(19,31);
+
+                helpers.logDebug('build: Build seams to be complete - image ID: ' + this._imageID );
+            }
+          }.bind(this));
+
+          res.on('end', function () {
+            helpers.logDebug('build: res received end - image ID: ' + this._imageID);
+            asyncCallback(null, 'image:'+this._imageID);
+          }.bind(this));
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+            helpers.logErr('build: problem with request: ' + e.message);
+            process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('build: recieved end - : ' + e.message);
+        });
+
+        // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+        var fs = require('fs');
+        var stream = fs.createReadStream('webapp.tar');
+
+        // Close the request when the stream is closed
+        stream.on('end', function() {
+          helpers.logDebug('build: stream received end');
+          req.end();
+        });
+
+        // send the data
+        stream.pipe(req);
+
+        helpers.logDebug('build: Data sent...');
+    };
     // createContainer
     //-------------------------------------------------------------------------------------------------
     //
@@ -421,9 +484,6 @@
     //
 
     this._inspect = function(asyncCallback){
-
-        helpers.logDebug('inspect: Start...');
-
         if (this._containerID === "") {
           helpers.logErr('inspect: this._containerID not set');
           process.exit();        
@@ -436,12 +496,9 @@
 
         this._dockerRemoteAPI(options, function(chunk) {
             this._settings = JSON.parse(chunk);
-            //console.log(prettyjson.render(this._settings));
-            helpers.logDebug('inspect: ' + this._settings.NetworkSettings.IPAddress);
         }.bind(this),
+        null,
         asyncCallback);
-
-        helpers.logDebug('inspect: Data sent...');        
     };
 
 
@@ -453,9 +510,6 @@
     //
 
     this._logs = function(asyncCallback){
-
-        helpers.logDebug('logs: Start...');
-
         if (this._containerID === "" || this._containerID === undefined) {
           helpers.logErr('logs: this._containerID not set');
           process.exit();        
@@ -472,9 +526,8 @@
         this._dockerRemoteAPI(options, function(chunk) {
             console.log('logs: ' + chunk);
           },
+          null,
           asyncCallback);
-
-        helpers.logDebug('logs: Data sent...');        
     };
 
 
@@ -565,6 +618,7 @@
             console.log('containers: ' + prettyjson.render(containers));
 
           },
+          null,
           asyncCallback);
 
         helpers.logDebug('containers: End...');  
