@@ -201,10 +201,10 @@
 
         if(funcReq !== null) {
           funcReq(req);
+        } else {
+          req.end();
         }
-
-        req.end();
-
+        
         helpers.logDebug('_dockerRemoteAPI: Data sent...');        
     };
 
@@ -643,6 +643,8 @@
 
         helpers.logDebug('createContainer: Data sent...');
    };
+
+
     // push
     //-------------------------------------------------------------------------------------------------
     //
