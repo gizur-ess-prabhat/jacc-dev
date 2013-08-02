@@ -131,7 +131,7 @@
 
       redis_client.on("connect", function () {
 
-          redis_client.keys("*", function(keys) {
+          redis_client.keys("*", function(err, keys) {
 
             helpers.logDebug('_proxyStatus: redis keys - ' + keys);
 
