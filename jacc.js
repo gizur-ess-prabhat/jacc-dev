@@ -553,11 +553,11 @@
 
       helpers.logDebug('status: Start...');
 
-      this._proxyStatus();
 
       if (argv.container === "" || argv.container === undefined) {
-        console.log('status requires the container parameter to be set!');
-        process.exit();        
+        this._proxyStatus();
+        //console.log('status requires the container parameter to be set!');
+        //process.exit();        
       }
 
       this._containerID = argv.container;
