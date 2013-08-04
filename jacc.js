@@ -139,6 +139,8 @@
                   this._containerID = res[1];
                   this._inspect(asyncCallback);
 
+                  helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
+ 
                   // Print some info
                   console.log(key+' - backend:'+res+' IP:'+this._settings.NetworkSettings.IPAddress);
                 });
