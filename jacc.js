@@ -134,7 +134,13 @@
           redis_client.keys("frontend*", function(err, keys) {
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
-                  console.log(key+' - backend:'+res);
+
+                  // Fetch the settings for the container
+                  this._containerID = res[1];
+                  this._inspect(asyncCallback);
+
+                  // Print some info
+                  console.log(key+' - backend:'+res+' IP:'+this._settings.NetworkSettings.IPAddress);
                 });
             });
 
@@ -393,7 +399,7 @@
     };
 
 
-    // inspect
+    // logs
     //-------------------------------------------------------------------------------------------------
     //
     // Get the logs of the started container (should show the current date since that's all the container does)
