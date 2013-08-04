@@ -717,7 +717,7 @@
             containers.forEach(function(container) {
               this._containerID = container.Id;
               this._inspect(asyncCallback);
-              this._settings.NetworkSettings.IPAddress
+              //this._settings.NetworkSettings.IPAddress
             });
 
             console.log('containers: ' + prettyjson.render(containers));
