@@ -344,6 +344,11 @@
           process.exit();        
         }
 
+        if (this._use_export !== undefined && this._use_export.length === 0) {
+          console.log('create container requires a command - for instance --use_export="node /src/index.js"');
+          process.exit();        
+        }
+
         var container = {
          "Hostname":"",
          "User":"",
@@ -362,6 +367,10 @@
          "Volumes":{},
          "VolumesFrom":""
         };
+
+        if (this._use_export !== undefined && this._use_export.length > 0) {
+          container.cmd = [this._use_export];
+        }
 
         var options = {
           path: '/containers/create',
@@ -739,11 +748,11 @@
 
         this._containerPort = argv.port;
 
-        this._use_export = (argv.use_export !== undefined);
+        this._use_export = argv.use_export;
 
         async.series([
             function(fn){ 
-              if(!this._use_export) {
+              if(this._use_export === undefined) {
                 this._build(fn); 
               } else {
                 this._import(fn);
