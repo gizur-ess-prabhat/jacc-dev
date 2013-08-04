@@ -375,8 +375,13 @@
               helpers.logInfo('createContainer: ' + chunk);
 
               // The result should look like this '{"Id":"c6bfd6da99d3"}'
-              this._containerID = JSON.parse(chunk).Id;            
-              helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
+              try {
+                this._containerID = JSON.parse(chunk).Id;            
+                helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
+              } catch (e) {
+                  console.log('Create container failed: '+chunk);
+                  process.exit();          
+              }
           }.bind(this),
           null,
           function(req) {
