@@ -226,7 +226,7 @@
         helpers.logDebug('build: Start...');
 
         var options = {
-          path: '/build',
+          path: '/build?nocache',
           method: 'POST',
           headers: {
             'Content-Type': 'application/tar',
