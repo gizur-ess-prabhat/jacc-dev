@@ -327,6 +327,7 @@
           function(req) {
               helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
               req.write(JSON.stringify(container));
+              req.end();
           }.bind(this),
           asyncCallback);
 
@@ -368,6 +369,7 @@
           function(req) {
             helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
             req.write(JSON.stringify(binds));
+            req.end();
           }.bind(this),
           asyncCallback);
 
