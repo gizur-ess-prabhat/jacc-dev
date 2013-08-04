@@ -72,6 +72,7 @@
         _containerID   = "",
         _name          = "",
         _containerPort,
+        _use_export    = false,
         _settings      = {};
 
 
@@ -214,6 +215,60 @@
         }
 
         helpers.logDebug('_dockerRemoteAPI: Data sent...');        
+    };
+
+
+    // import
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
+    //
+
+    this._import = function(asyncCallback){
+
+        helpers.logDebug('import: Start...');
+
+        var options = {
+          path: '/images/create?fromSrc=-',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/tar',
+          }
+        };
+
+        this._dockerRemoteAPI(options, 
+          function(chunk) {
+            helpers.logDebug('import: ' + chunk);
+
+            this._imageID = JSON.parse(chunk).status;
+          }.bind(this),
+          function() {
+            if(this._imageID === "" || this._imageID === undefined) {
+              helpers.logErr('Import failed! No image was created.');
+              process.exit();
+            }
+            helpers.logDebug('import: res received end - image ID: ' + this._imageID);
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'image:'+this._imageID);
+            }      
+          }.bind(this),
+          function(req) {
+            // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+            var fs = require('fs');
+            var stream = fs.createReadStream('webapp.export.tar');
+
+            // Close the request when the stream is closed
+            stream.on('end', function() {
+              helpers.logDebug('import: stream received end');
+              req.end();
+            }.bind(this));
+
+            // send the data
+            stream.pipe(req);
+          }.bind(this),
+          asyncCallback);
+
+        helpers.logDebug('import: Data sent...');
     };
 
 
@@ -679,8 +734,16 @@
 
         this._containerPort = argv.port;
 
+        this._use_export = (argv.use_export !== undefined);
+
         async.series([
-            function(fn){ this._build(fn); }.bind(this),
+            function(fn){ 
+              if(!this._use_export) {
+                this._build(fn); 
+              } else {
+                this._import(fn);
+              }
+            }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
