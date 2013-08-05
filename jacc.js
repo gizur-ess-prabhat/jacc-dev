@@ -138,7 +138,7 @@
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
 
-                  helpers.logDebug('hipache entry:'+key+'res:'+res);
+                  helpers.logDebug('hipache entry:'+key+' res:'+res);
 
                   // Fetch the settings for the container
                   this._containerID = res[1];
@@ -533,6 +533,11 @@
     this.push = function(){
 
         helpers.logDebug('push: Start...');
+
+        if (argv.cmd === "" || argv.cmd === undefined) {
+          console.log('jacc requires a command, jacc.js --cmd push|status|help!');
+          process.exit();        
+        }
 
         if (argv.name === "" || argv.name === undefined) {
           console.log('push requires the container name to be set - for instance --name=www.example.com!');
