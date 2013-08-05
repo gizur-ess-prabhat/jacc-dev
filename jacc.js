@@ -133,8 +133,12 @@
       redis_client.on("connect", function () {
 
           redis_client.keys("frontend*", function(err, keys) {
+            helpers.logDebug('_proxyStatus: redis connected...');
+
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
+
+                  helpers.logDebug('hipache entry:'+key+'res:'+res);
 
                   // Fetch the settings for the container
                   this._containerID = res[1];
@@ -147,6 +151,7 @@
                 });
             });
 
+            helpers.logDebug('_proxyStatus: close redis connection...');
             redis_client.quit();
 
             helpers.logDebug('_proxyStatus: end');
