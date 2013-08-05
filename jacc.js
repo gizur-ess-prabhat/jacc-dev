@@ -690,6 +690,7 @@
 
       helpers.logDebug('status: Start...');
 
+      // List all containers
       if (argv.name === "" || argv.name === undefined) {
         async.series([
             function(fn){ this._proxyStatus(fn); }.bind(this),
@@ -699,13 +700,16 @@
           helpers.logDebug('status: results of async functions - ' + results);
           helpers.logDebug('status: errors (if any) - ' + err);
         });
-      } else {
+      } 
+
+      // Show status for a specific container
+      else {
 
         //this._containerID = argv.container;
         this._name        = argv.name;
-        this._proxyGetContainerIDForName();
 
         async.series([
+            function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
             function(fn){ 
