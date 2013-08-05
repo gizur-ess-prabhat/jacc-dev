@@ -81,7 +81,7 @@
 
     this._isset = function(a, message){
       helpers.logDebug('_isset: checking - ' + a);
-      if (a === "" || a === undefined || a === null) {
+      if (a === "" || a === undefined || a === null || a === []) {
         helpers.logErr(message);
         process.exit();        
       }
