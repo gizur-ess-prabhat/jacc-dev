@@ -157,7 +157,7 @@
 
                   // Fetch the settings for the container
                   this._containerID = res[0];
-                  async([
+                  async.series([
                     function() { this._inspect(asyncCallback); }.bind(this),
                     function() {
                       helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
