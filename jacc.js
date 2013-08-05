@@ -157,12 +157,18 @@
 
                   // Fetch the settings for the container
                   this._containerID = res[0];
-                  this._inspect(asyncCallback);
-
-                  helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
+                  async([
+                    function() { this._inspect(asyncCallback); }.bind(this),
+                    function() {
+                      helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
  
-                  // Print some info
-                  console.log(key+' - backend:'+res+' IP:'+((this._settings !== undefined) ? this._settings.NetworkSettings.IPAddress : 'not set!') );
+                      // Print some info
+                      console.log(key+' - backend:'+res+
+                                  ' IP:'+((this._settings !== undefined) ? 
+                                    this._settings.NetworkSettings.IPAddress : 
+                                    'not set!') );
+                    }.bind(this)
+                  ]);
                 });
             });
 
