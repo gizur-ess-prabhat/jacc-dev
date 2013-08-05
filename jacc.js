@@ -484,7 +484,13 @@
         };
 
         this._dockerRemoteAPI(options, function(chunk) {
-            this._settings = JSON.parse(chunk);
+            helpers.logDebug('inspect: '+chunk);
+            try {
+              this._settings = JSON.parse(chunk);
+            } catch (e) {
+              helpers.logErr('inspect: error fetching data for - ' + this._containerID);
+              //process.exit();              
+            }
         }.bind(this),
         null,
         null,
