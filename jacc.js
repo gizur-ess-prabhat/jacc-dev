@@ -76,6 +76,16 @@
         _settings      = {};
 
 
+    // helpers
+    //======================================================================
+
+    this._isset = function(arg, message){
+      if (arg === "" || arg === undefined) {
+        helpers.logErr(message);
+        process.exit();        
+      }
+    }
+
     // hipache functions
     //======================================================================
 
@@ -708,7 +718,10 @@
 
         async.series([
             function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
-            function(fn){ this._inspect(fn); }.bind(this),
+            function(fn){ 
+              this._isset(this._containerID, 'There is no app with the name: '+this._name));
+              this._inspect(fn); 
+            }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
             function(fn){ 
               console.log(prettyjson.render(this._settings));
