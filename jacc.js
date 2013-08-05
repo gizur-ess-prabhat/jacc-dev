@@ -92,7 +92,7 @@
       var redis_client = redis.createClient();
 
       redis_client.on("connect", function () {
-          redis_client.rpush("frontend:"+this._name, this._name, 
+          redis_client.rpush("frontend:"+this._name, this._containerID, 
             function(err, res) {
               if(err) {
                 helpers.logErr('ERROR! updateProxy failed when writing to Redis');
@@ -102,7 +102,7 @@
 
           var backend = "http://"+this._settings.NetworkSettings.IPAddress+":"+this._containerPort;
 
-          redis_client.rpush("frontend:"+this._containerID, 
+          redis_client.rpush("frontend:"+this._name, 
                              backend, 
                               function(err, res) {
                                 if(err) {
