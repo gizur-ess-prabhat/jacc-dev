@@ -99,9 +99,9 @@
 
       redis_client.on("connect", function () {
 
-          helpers.logDebug('_proxyGetContainerIDForName: redis connected...');
+          helpers.logDebug('_proxyGetContainerIDForName: redis connected - looking for '+this._name);
 
-          redis_client.lrange("fontend:"+this._name, 0, 0, function(err, res) {
+          redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
             helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"fontend:"+this._name+'='+res);
 
             this._containerID = res;
