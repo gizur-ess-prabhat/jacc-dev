@@ -458,7 +458,7 @@
     //
 
     this._inspect = function(asyncCallback){
-        if (this._containerID === "" || this._containerID === undefined ) {
+        if (this._containerID === "") {
           helpers.logErr('inspect: this._containerID not set');
           process.exit();        
         }
@@ -522,6 +522,211 @@
       }
 
     };
+
+    // to be cleaned up
+    //-------------------------------------------------------------------------------------------------
+    //
+
+
+    this._build_old = function(asyncCallback){
+
+        helpers.logDebug('build.old: Start...');
+
+        var options2 = {
+          hostname: '',
+          port: 0,
+          path: '/build',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/tar',
+          }
+        };
+
+        options2.hostname = this.hostname;
+        options2.port = this.port;
+
+
+        helpers.logDebug('build.old: options2: ' + JSON.stringify(options2));
+
+        var req = http.request(options2, function(res) {
+          helpers.logDebug('build.old: STATUS: ' + res.statusCode);
+          helpers.logDebug('build.old: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('build.old: options: ' + JSON.stringify(options2));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('build.old: ' + chunk);
+
+            // The last row looks like this 'Successfully built 3df239699c83'
+            if (chunk.slice(0,18) === 'Successfully built') {
+                this._imageID = chunk.slice(19,31);
+
+                helpers.logDebug('build.old: Build seams to be complete - image ID: ' + this._imageID );
+            }
+          }.bind(this));
+
+          res.on('end', function () {
+            helpers.logDebug('build.old: res received end - image ID: ' + this._imageID);
+            asyncCallback(null, 'image:'+this._imageID);
+          }.bind(this));
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+            helpers.logErr('build.old: problem with request: ' + e.message);
+            process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('build.old: recieved end - : ' + e.message);
+        });
+
+        // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+        var fs = require('fs');
+        var stream = fs.createReadStream('webapp.tar');
+
+        // Close the request when the stream is closed
+        stream.on('end', function() {
+          helpers.logDebug('build.old: stream received end');
+          req.end();
+        });
+
+        // send the data
+        stream.pipe(req);
+
+        helpers.logDebug('build.old: Data sent...');
+    };
+
+    this._start_old = function(asyncCallback){
+
+        helpers.logDebug('start: Start...');
+
+        if (this._containerID === "") {
+          helpers.logErr('start: this._containerID not set');
+          process.exit();        
+        }
+
+        var binds = {
+            "Binds":["/tmp:/tmp"]
+        };
+
+        var options = {
+          hostname: this.hostname,
+          port:     this.port,
+          path:     '/containers/'+this._containerID+'/start',
+          method:   'POST'
+        };
+
+        helpers.logDebug('start: path - ' + options.path);
+        helpers.logDebug('start: container - ' + this._containerID);
+
+        var req = http.request(options, function(res) {
+          helpers.logDebug('start: STATUS: ' + res.statusCode);
+          helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
+          helpers.logDebug('start: options: ' + JSON.stringify(options));
+
+          res.setEncoding('utf8');
+
+          res.on('data', function (chunk) {
+            helpers.logInfo('start: ' + chunk);
+          });
+
+          res.on('end', function () {
+            helpers.logDebug('start: res received end');
+            asyncCallback(null, 'start completed');
+          });
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('start: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('start: recieved end - ' + e.message);
+        });
+
+        helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
+        req.write(JSON.stringify(binds));
+        req.end();
+
+        helpers.logDebug('start: Data sent...');        
+    };
+
+    this._createContainer_old = function(asyncCallback){
+
+        if (this._imageID === "") {
+          helpers.logErr('createContainer: this._imageID not set');
+          process.exit();        
+        }
+
+        var container = {
+         "Hostname":"",
+         "User":"",
+         "Memory":0,
+         "MemorySwap":0,
+         "AttachStdin":false,
+         "AttachStdout":true,
+         "AttachStderr":true,
+         "PortSpecs":null,
+         "Tty":false,
+         "OpenStdin":false,
+         "StdinOnce":false,
+         "Env":null,
+         "Dns":null,
+         "Image":this._imageID,
+         "Volumes":{},
+         "VolumesFrom":""
+        };
+
+        var options = {
+          hostname: this.hostname,
+          port: this.port,
+          path: '/containers/create',
+          method: 'POST'
+        };
+
+        helpers.logDebug('createContainer: Start...');
+
+        var req = http.request(options, function(res) {
+            helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
+            helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
+            helpers.logDebug('createContainer: options: ' + JSON.stringify(options));
+
+            res.setEncoding('utf8');
+
+            res.on('data', function (chunk) {
+                helpers.logInfo('createContainer: ' + chunk);
+
+                // The result should look like this '{"Id":"c6bfd6da99d3"}'
+                this._containerID = JSON.parse(chunk).Id;            
+                helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
+            }.bind(this));
+
+            res.on('end', function () {
+              helpers.logDebug('createContainer: res received end');
+              asyncCallback(null, 'container:'+this._containerID);
+            }.bind(this));
+
+        }.bind(this));
+
+        req.on('error', function(e) {
+          helpers.logErr('createContainer: problem with request: ' + e.message);
+          process.exit();
+        });
+
+        req.on('end', function(e) {
+            helpers.logDebug('createContainer: recieved end - ' + e.message);
+        });
+
+        helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
+        req.write(JSON.stringify(container));
+        req.end();
+
+        helpers.logDebug('createContainer: Data sent...');
+   };
 
 
     // push
