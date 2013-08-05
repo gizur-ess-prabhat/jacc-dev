@@ -79,6 +79,50 @@
     // hipache functions
     //======================================================================
 
+
+    // _proxyGetContainerIDForName
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Get the this._containerID based on this._name
+    //
+
+    this._proxyGetContainerIDForName = function(asyncCallback){
+
+      helpers.logDebug('_proxyGetContainerIDForName: Start...'+this._name);
+
+      if (this._name === "" || this._name === undefined) {
+        helpers.logErr('_proxyGetContainerIDForName: this._name not set');
+        process.exit();        
+      }
+
+      var redis_client = redis.createClient();
+
+      redis_client.on("connect", function () {
+
+          helpers.logDebug('_proxyGetContainerIDForName: redis connected...');
+
+          redis_client.lrange("fontend:"+this._name, 0, 0, function(err, res) {
+            helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"fontend:"+this._name+'='+res);
+
+            this._containerID = res;
+          });
+
+          redis_client.quit();
+
+          helpers.logDebug('_proxyGetContainerIDForName: end');
+          if(asyncCallback !== undefined) {
+            asyncCallback(null, '_proxyGetContainerIDForName completed');
+          }
+
+      }.bind(this));
+
+      // redis error management
+      redis_client.on("error", function (err) {
+          helpers.logErr("Redis error: " + err);
+      });
+
+    };
+
     // updateProxy
     //-------------------------------------------------------------------------------------------------
     //
@@ -153,7 +197,7 @@
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
 
-                  helpers.logDebug('hipache entry:'+key+' res:'+res);
+                  helpers.logDebug('_proxyStatus: hipache entry:'+key+' res:'+res);
 
                   // Fetch the settings for the container
                   this._containerID = res[0];
@@ -183,7 +227,6 @@
             }
 
           });
-
 
       }.bind(this));
 
@@ -647,7 +690,7 @@
 
       helpers.logDebug('status: Start...');
 
-      if (argv.container === "" || argv.container === undefined) {
+      if (argv.name === "" || argv.name === undefined) {
         async.series([
             function(fn){ this._proxyStatus(fn); }.bind(this),
             /*function(fn){ this._containers(fn); }.bind(this)*/
@@ -658,8 +701,9 @@
         });
       } else {
 
-        this._containerID = argv.container;
+        //this._containerID = argv.container;
         this._name        = argv.name;
+        this._proxyGetContainerIDForName();
 
         async.series([
             function(fn){ this._inspect(fn); }.bind(this),
@@ -689,7 +733,7 @@
 
         case "help":
             console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
-            console.log('--cmd status --container=XXX: show logs for container');
+            console.log('--cmd status --name=XXX: show logs for container');
             console.log('--help: show this message');
             break;
 
