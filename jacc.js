@@ -92,13 +92,25 @@
       var redis_client = redis.createClient();
 
       redis_client.on("connect", function () {
-          redis_client.rpush("frontend:"+this._name, this._name, redis.print);
+          redis_client.rpush("frontend:"+this._name, this._name, 
+            function(err, res) {
+              if(err) {
+                helpers.logErr('ERROR! updateProxy failed when writing to Redis');
+              }
+              helpers.logDebug('_updateProxy: wrote frontend - '+res);
+            });
 
           var backend = "http://"+this._settings.NetworkSettings.IPAddress+":"+this._containerPort;
 
           redis_client.rpush("frontend:"+this._containerID, 
                              backend, 
-                             redis.print);
+                              function(err, res) {
+                                if(err) {
+                                  helpers.logErr('ERROR! updateProxy failed when writing to Redis');
+                                }
+                                helpers.logDebug('_updateProxy: wrote frontend - '+res);
+
+                              });
 
           redis_client.quit();
 
@@ -132,8 +144,10 @@
 
       redis_client.on("connect", function () {
 
+          helpers.logDebug('_proxyStatus: redis connected...');
+
           redis_client.keys("frontend*", function(err, keys) {
-            helpers.logDebug('_proxyStatus: redis connected...');
+            helpers.logDebug('_proxyStatus: keys - '+keys);
 
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
@@ -566,8 +580,8 @@
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
             function(fn){ this._updateProxy(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this),
             function(fn){ this._close(fn); }.bind(this),
         ],
         function(err, results){
