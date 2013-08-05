@@ -80,8 +80,8 @@
     //======================================================================
 
     this._isset = function(a, message){
-      helpers.logDebug('_isset: checking - ' + a);
-      if (a === "" || a === undefined || a === null || a === []) {
+      helpers.logDebug('_isset: checking - ' + a + ' with length - '+a.length() );
+      if (a === "" || a === undefined || a === null || a === [] || a === {}) {
         helpers.logErr(message);
         process.exit();        
       }
