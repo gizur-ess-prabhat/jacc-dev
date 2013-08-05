@@ -821,8 +821,12 @@
       if (argv.container === "" || argv.container === undefined) {
         async.series([
             function(fn){ this._proxyStatus(fn); }.bind(this),
-            function(fn){ this._containers(fn); }.bind(this)
-        ]);
+            /*function(fn){ this._containers(fn); }.bind(this)*/
+        ],
+        function(err, results){
+          helpers.logDebug('status: results of async functions - ' + results);
+          helpers.logDebug('status: errors (if any) - ' + err);
+        });
       } else {
 
         this._containerID = argv.container;
