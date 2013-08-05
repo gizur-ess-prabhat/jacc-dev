@@ -103,17 +103,15 @@
 
           redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
             helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"fontend:"+this._name+'='+res);
-
             this._containerID = res;
+
+            redis_client.quit();
+
+            helpers.logDebug('_proxyGetContainerIDForName: end');
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, '_proxyGetContainerIDForName completed');
+            }
           });
-
-          redis_client.quit();
-
-          helpers.logDebug('_proxyGetContainerIDForName: end');
-          if(asyncCallback !== undefined) {
-            asyncCallback(null, '_proxyGetContainerIDForName completed');
-          }
-
       }.bind(this));
 
       // redis error management
