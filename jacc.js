@@ -158,8 +158,8 @@
                   // Fetch the settings for the container
                   this._containerID = res[0];
                   async.series([
-                    function() { this._inspect(asyncCallback); }.bind(this),
-                    function() {
+                    function(fn) { this._inspect(fn); }.bind(this),
+                    function(fn) {
                       helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
  
                       // Print some info
@@ -167,6 +167,8 @@
                                   ' IP:'+((this._settings !== undefined) ? 
                                     this._settings.NetworkSettings.IPAddress : 
                                     'not set!') );
+
+                      fn(null, '_proxyStatus partial');
                     }.bind(this)
                   ]);
                 });
