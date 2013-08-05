@@ -162,7 +162,7 @@
                   helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
  
                   // Print some info
-                  console.log(key+' - backend:'+res+' IP:'+(this._settings.NetworkSettings.IPAddress !== undefined) ? this._settings.NetworkSettings.IPAddress : 'not set!' );
+                  console.log(key+' - backend:'+res+' IP:'+(this._settings !== undefined) ? this._settings.NetworkSettings.IPAddress : 'not set!' );
                 });
             });
 
