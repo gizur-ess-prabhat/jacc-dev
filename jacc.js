@@ -719,7 +719,7 @@
         async.series([
             function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
             function(fn){ 
-              this._isset(this._containerID, 'There is no app with the name: '+this._name));
+              this._isset(this._containerID, 'There is no app with the name: '+this._name);
               this._inspect(fn); 
             }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
