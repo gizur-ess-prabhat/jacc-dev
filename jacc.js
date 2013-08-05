@@ -79,8 +79,8 @@
     // helpers
     //======================================================================
 
-    this._isset = function(arg, message){
-      if (arg === "" || arg === undefined) {
+    this._isset = function(a, message){
+      if (a === "" || a === undefined || a === null) {
         helpers.logErr(message);
         process.exit();        
       }
@@ -713,7 +713,7 @@
       // Show status for a specific container
       else {
 
-        //this._containerID = argv.container;
+        this._containerID = null;
         this._name        = argv.name;
 
         async.series([
