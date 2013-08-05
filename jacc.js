@@ -135,6 +135,7 @@
     //
     // Print contents of redis database
     //
+    // NOTE: Currently only fetching status for the first backend
 
     this._proxyStatus = function(asyncCallback){
 
@@ -155,7 +156,7 @@
                   helpers.logDebug('hipache entry:'+key+' res:'+res);
 
                   // Fetch the settings for the container
-                  this._containerID = res[1];
+                  this._containerID = res[0];
                   this._inspect(asyncCallback);
 
                   helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
