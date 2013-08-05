@@ -82,7 +82,7 @@
     this._isset = function(a, message){
       helpers.logDebug('_isset: checking - ' + a );
       if (a === "" || a === undefined || a === null || a === [] || a === {}) {
-        helpers.logErr(message);
+        console.log(message);
         process.exit();        
       }
     }
@@ -615,7 +615,11 @@
 
         helpers.logDebug('push: Start...');
 
-        if (argv.cmd === "" || argv.cmd === undefined) {
+        this._isset(argv.cmd, 'jacc requires a command, jacc.js --cmd push|status|help!');
+        this._isset(argv.name, 'push requires the container name to be set - for instance --name=www.example.com!');
+        this._isset(argv.port, 'push requires the container port to be set - for instance --port=8080!');
+
+        /*if (argv.cmd === "" || argv.cmd === undefined) {
           console.log('jacc requires a command, jacc.js --cmd push|status|help!');
           process.exit();        
         }
@@ -625,15 +629,14 @@
           process.exit();        
         }
 
-        this._name = argv.name;
 
         if (argv.port === "" || argv.port === undefined) {
           console.log('push requires the container port to be set - for instance --port=8080!');
           process.exit();        
-        }
+        }*/
 
+        this._name = argv.name;
         this._containerPort = argv.port;
-
         this._use_export = argv.use_export;
 
         async.series([
