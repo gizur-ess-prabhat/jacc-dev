@@ -3,7 +3,26 @@ Jacc - Just Another Cloud in the Cloud
 
 Lighweight linux containers are used to build a private cloud. Booting a new container is easy
 and is done in a few seconds. Create a tar archive named webapp.tar containing the code and a
-Dockerfile in the root and then run `/path_to_jacc/jacc --cmd push`.
+Dockerfile in the root and then run `/path_to_jacc/jacc.js --cmd push --name=www.mydomain.com --port=80`.
+
+Jacc manages routing to the right webapp using the name provided. Your DNS needs to point
+to the Jacc server. For development and testing purposes can this be solved by updating the local
+hosts file.
+
+I've added this to the hosts file on my development laptop: 
+
+```
+127.0.0.1       app1.jacc.local
+127.0.0.1       app2.jacc.local
+127.0.0.1       app3.jacc.local
+```
+
+Test that everything works by deploying the webapp in tests folder:
+
+```
+cd tests
+../jacc.js --cmd push --name=app1.jacc.local --port=8080
+```
 
 
 Installation
