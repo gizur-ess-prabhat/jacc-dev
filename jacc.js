@@ -124,7 +124,7 @@
             if(asyncCallback !== undefined) {
               asyncCallback(null, '_proxyGetContainerIDForName completed');
             }
-          });
+          }.bind(this));
       }.bind(this));
 
       // redis error management
