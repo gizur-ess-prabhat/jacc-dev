@@ -101,10 +101,7 @@
 
       helpers.logDebug('_proxyGetContainerIDForName: Start...'+this._name);
 
-      if (this._name === "" || this._name === undefined) {
-        helpers.logErr('_proxyGetContainerIDForName: this._name not set');
-        process.exit();        
-      }
+      this._isset(this._name, '_proxyGetContainerIDForName: this._name not set');
 
       var redis_client = redis.createClient();
 
@@ -131,6 +128,7 @@
       });
 
     };
+
 
     // updateProxy
     //-------------------------------------------------------------------------------------------------
@@ -323,10 +321,7 @@
             this._imageID = JSON.parse(chunk).status;
           }.bind(this),
           function() {
-            if(this._imageID === "" || this._imageID === undefined) {
-              helpers.logErr('Import failed! No image was created.');
-              process.exit();
-            }
+            this._isset(this._imageID, 'Import failed! No image was created.');
             helpers.logDebug('import: res received end - image ID: ' + this._imageID);
             if(asyncCallback !== undefined) {
               asyncCallback(null, 'image:'+this._imageID);
@@ -381,10 +376,7 @@
             }
           }.bind(this),
           function() {
-            if(this._imageID === "" || this._imageID === undefined) {
-              helpers.logErr('Build failed! No image was created.');
-              process.exit();
-            }
+            this._isset(this._imageID, 'Build failed! No image was created.');
             helpers.logDebug('build: res received end - image ID: ' + this._imageID);
             if(asyncCallback !== undefined) {
               asyncCallback(null, 'image:'+this._imageID);
@@ -419,10 +411,7 @@
 
     this._createContainer = function(asyncCallback){
 
-        if (this._imageID === "") {
-          helpers.logErr('createContainer: this._imageID not set');
-          process.exit();        
-        }
+        this._isset(this._imageID, 'createContainer: this._imageID not set');
 
         if (this._use_export !== undefined && this._use_export.length === 0) {
           console.log('create container requires a command - for instance --use_export="node /src/index.js"');
@@ -494,10 +483,7 @@
 
         helpers.logDebug('start: Start...');
 
-        if (this._containerID === "") {
-          helpers.logErr('start: this._containerID not set');
-          process.exit();        
-        }
+        this._isset(this._containerID, 'start: this._containerID not set');
 
         var binds = {
             "Binds":["/tmp:/tmp"]
@@ -533,10 +519,8 @@
     //
 
     this._inspect = function(asyncCallback){
-        if (this._containerID === "" || this._containerID === undefined ) {
-          helpers.logErr('inspect: this._containerID not set');
-          process.exit();        
-        }
+
+        this._isset(this._containerID, 'inspect: this._containerID not set');
 
         var options = {
           path:     '/containers/'+this._containerID+'/json',
@@ -566,10 +550,7 @@
     //
 
     this._logs = function(asyncCallback){
-        if (this._containerID === "" || this._containerID === undefined) {
-          helpers.logErr('logs: this._containerID not set');
-          process.exit();        
-        }
+        this._isset(this._containerID, 'logs: this._containerID not set');
 
         var options = {
           path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
@@ -615,25 +596,8 @@
 
         helpers.logDebug('push: Start...');
 
-        this._isset(argv.cmd, 'jacc requires a command, jacc.js --cmd push|status|help!');
         this._isset(argv.name, 'push requires the container name to be set - for instance --name=www.example.com!');
         this._isset(argv.port, 'push requires the container port to be set - for instance --port=8080!');
-
-        /*if (argv.cmd === "" || argv.cmd === undefined) {
-          console.log('jacc requires a command, jacc.js --cmd push|status|help!');
-          process.exit();        
-        }
-
-        if (argv.name === "" || argv.name === undefined) {
-          console.log('push requires the container name to be set - for instance --name=www.example.com!');
-          process.exit();        
-        }
-
-
-        if (argv.port === "" || argv.port === undefined) {
-          console.log('push requires the container port to be set - for instance --port=8080!');
-          process.exit();        
-        }*/
 
         this._name = argv.name;
         this._containerPort = argv.port;
@@ -743,6 +707,8 @@
     // main
     //-------------------------------------------------------------------------------------------------
     //
+
+    this._isset(argv.cmd, 'jacc requires a command, jacc.js --cmd push|status|help!');
 
     switch (argv.cmd) {
 
