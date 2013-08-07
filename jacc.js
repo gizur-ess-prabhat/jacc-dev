@@ -79,13 +79,18 @@
     // helpers
     //======================================================================
 
+    this._isset2 = function(a, message){
+      return (a === "" || a === undefined || a === null || a === [] || a === {});
+    }
+
     this._isset = function(a, message){
       helpers.logDebug('_isset: checking - ' + a );
-      if (a === "" || a === undefined || a === null || a === [] || a === {}) {
+      if (this._isset2(a)) {
         console.log(message);
         process.exit();        
       }
     }
+
 
     // hipache functions
     //======================================================================
@@ -512,6 +517,75 @@
     };
 
 
+    // delete
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -d '' http://localhost:4243/containers/c6bfd6da99d3/stop?t=10
+    //
+
+    this._delete = function(asyncCallback){
+
+        helpers.logDebug('delete: Start...');
+
+        async.series([
+          // Get the container ID for the name
+          function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
+
+          // Fetch the container settings
+          function(fn) {
+            if (this._isset2(this._containerID)) {
+              this._inspect(fn);
+            }
+          }.bind(this),
+
+          // stop the container
+          function(fn) {
+            if (this._isset2(this._containerID)) {
+
+              var options = {
+                path:     '/containers/'+this._containerID+'/stop?t=10',
+                method:   'POST'
+              };
+
+              helpers.logDebug('delete: stop container - ' + this._containerID);
+
+              this._dockerRemoteAPI(options, 
+                function(chunk) {
+                  helpers.logDebug('delete: ' + chunk);
+                }.bind(this),
+                null,
+                null,
+                asyncCallback);
+            }
+          }.bind(this),
+
+          // Delete the image
+          function(fn) {
+            if (this._isset2(this._imageID)) {
+
+              var options = {
+                path:     '/images/'+this._imageID,
+                method:   'DELETE'
+              };
+
+              helpers.logDebug('delete: delete image - ' + this._imageID);
+
+              this._dockerRemoteAPI(options, 
+                function(chunk) {
+                  helpers.logDebug('delete: ' + chunk);
+                }.bind(this),
+                null,
+                null,
+                asyncCallback);
+            }
+          }.bind(this)
+          ]);
+
+
+        helpers.logDebug('delete: Data sent...');        
+    };
+
+
     // inspect
     //-------------------------------------------------------------------------------------------------
     //
@@ -569,23 +643,6 @@
     };
 
 
-    // close
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Clenaup
-    //
-
-    this._close = function(asyncCallback){
-
-      helpers.logDebug('close: Start...');
- 
-      if(asyncCallback !== undefined) {
-        asyncCallback(null, 'close completed');
-      }
-
-    };
-
-
     // push
     //-------------------------------------------------------------------------------------------------
     //
@@ -599,12 +656,16 @@
         this._isset(argv.name, 'push requires the container name to be set - for instance --name=www.example.com!');
         this._isset(argv.port, 'push requires the container port to be set - for instance --port=8080!');
 
-        this._name = argv.name;
+        this._name          = argv.name;
         this._containerPort = argv.port;
-        this._use_export = argv.use_export;
+        this._use_export    = argv.use_export;
 
         async.series([
-            function(fn){ 
+            // Delete the container and image if it already exists
+            function(fn){ this._delete(fn); }.bind(this),
+
+            // Create new image and container
+            function(fn){
               if(this._use_export === undefined) {
                 this._build(fn); 
               } else {
@@ -615,8 +676,7 @@
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
             function(fn){ this._updateProxy(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
-            function(fn){ this._close(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this)
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
