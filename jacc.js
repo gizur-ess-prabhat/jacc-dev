@@ -85,7 +85,7 @@
 
     this._isset = function(a, message){
       helpers.logDebug('_isset: checking - ' + a );
-      if (!this._notset(a)) {
+      if (this._notset(a)) {
         console.log(message);
         process.exit();        
       }
