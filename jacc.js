@@ -533,6 +533,7 @@
 
           // Fetch the container settings
           function(fn) {
+            helpers.logDebug('delete: inspect container with container ID '+this._containerID);
             if (this._isset2(this._containerID)) {
               this._inspect(fn);
             }
