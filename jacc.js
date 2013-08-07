@@ -555,7 +555,28 @@
                 }.bind(this),
                 null,
                 null,
-                asyncCallback);
+                fn);
+            }
+          }.bind(this),
+
+          // Delete the container
+          function(fn) {
+            if (this._isset2(this._containerID)) {
+
+              var options = {
+                path:     '/containers/'+this._containerID+'?v=1',
+                method:   'DELETE'
+              };
+
+              helpers.logDebug('delete: remove container - ' + this._containerID);
+
+              this._dockerRemoteAPI(options, 
+                function(chunk) {
+                  helpers.logDebug('delete: ' + chunk);
+                }.bind(this),
+                null,
+                null,
+                fn);
             }
           }.bind(this),
 
@@ -568,7 +589,7 @@
                 method:   'DELETE'
               };
 
-              helpers.logDebug('delete: delete image - ' + this._imageID);
+              helpers.logDebug('delete: remove image - ' + this._imageID);
 
               this._dockerRemoteAPI(options, 
                 function(chunk) {
@@ -576,7 +597,7 @@
                 }.bind(this),
                 null,
                 null,
-                asyncCallback);
+                fn);
             }
           }.bind(this)
           ]);
