@@ -115,7 +115,7 @@
           helpers.logDebug('_proxyGetContainerIDForName: redis connected - looking for '+this._name);
 
           redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
-            helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"fontend:"+this._name+'='+res);
+            helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res);
             this._containerID = res;
 
             redis_client.quit();
@@ -540,6 +540,7 @@
 
           // stop the container
           function(fn) {
+            helpers.logDebug('delete: stop container with container ID '+this._containerID);
             if (this._isset2(this._containerID)) {
 
               var options = {
@@ -561,6 +562,7 @@
 
           // Delete the container
           function(fn) {
+            helpers.logDebug('delete: remove container with container ID '+this._containerID);
             if (this._isset2(this._containerID)) {
 
               var options = {
@@ -582,6 +584,7 @@
 
           // Delete the image
           function(fn) {
+            helpers.logDebug('delete: remove image with image ID '+this._imageID);
             if (this._isset2(this._imageID)) {
 
               var options = {
