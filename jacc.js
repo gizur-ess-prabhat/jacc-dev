@@ -79,13 +79,13 @@
     // helpers
     //======================================================================
 
-    this._isset2 = function(a, message){
+    this._notset = function(a, message){
       return (a === "" || a === undefined || a === null || a === [] || a === {});
     }
 
     this._isset = function(a, message){
       helpers.logDebug('_isset: checking - ' + a );
-      if (this._isset2(a)) {
+      if (!this._notset(a)) {
         console.log(message);
         process.exit();        
       }
@@ -534,7 +534,7 @@
           // Fetch the container settings
           function(fn) {
             helpers.logDebug('delete: inspect container with container ID '+this._containerID);
-            if (this._isset2(this._containerID)) {
+            if (!this._notset(this._containerID)) {
               this._inspect(fn);
             }
           }.bind(this),
@@ -542,7 +542,7 @@
           // stop the container
           function(fn) {
             helpers.logDebug('delete: stop container with container ID '+this._containerID);
-            if (this._isset2(this._containerID)) {
+            if (!this._notset(this._containerID)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'/stop?t=10',
@@ -564,7 +564,7 @@
           // Delete the container
           function(fn) {
             helpers.logDebug('delete: remove container with container ID '+this._containerID);
-            if (this._isset2(this._containerID)) {
+            if (!this._notset(this._containerID)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'?v=1',
@@ -586,7 +586,7 @@
           // Delete the image
           function(fn) {
             helpers.logDebug('delete: remove image with image ID '+this._imageID);
-            if (this._isset2(this._imageID)) {
+            if (!this._notset(this._imageID)) {
 
               var options = {
                 path:     '/images/'+this._imageID,
