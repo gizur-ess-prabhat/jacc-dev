@@ -701,7 +701,7 @@
             try {
               this._settings = JSON.parse(chunk);
               this._imageID  = this._settings.Image;
-              helpers.logDebug('inspect: this._settings='+JSON.stringify(this._settings));
+              helpers.logDebug('inspect: this._settings='+prettyjson.render(this._settings));
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
             }
