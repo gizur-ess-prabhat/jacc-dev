@@ -613,9 +613,11 @@
             }
           }.bind(this),
           function(fn) {
+            helpers.logDebug('delete: end of series');
             if(asyncCallback !== undefined) {
               asyncCallback(null, 'delete finished (inner)');
             }
+            helpers.logDebug('delete: end of series again');
             fn(null, 'delete finished (outer)');
           }
           ]);
