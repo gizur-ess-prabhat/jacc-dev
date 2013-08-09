@@ -81,7 +81,7 @@
 
     this._notset = function(a, message){
       return (a === "" || a === undefined || a === null || a === [] || a === {});
-    }
+    };
 
     this._isset = function(a, message){
       helpers.logDebug('_isset: checking - ' + a );
@@ -89,7 +89,7 @@
         console.log(message);
         process.exit();        
       }
-    }
+    };
 
 
     // hipache functions
@@ -630,7 +630,7 @@
             helpers.logDebug('inspect: '+chunk);
             try {
               this._settings = JSON.parse(chunk);
-              this._imageID  = this._settings
+              this._imageID  = this._settings;
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
               //process.exit();              
@@ -746,7 +746,7 @@
           asyncCallback);
 
         helpers.logDebug('containers: End...');  
-    }
+    };
 
     this.status = function(){
 

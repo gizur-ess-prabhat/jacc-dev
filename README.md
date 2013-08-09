@@ -39,6 +39,9 @@ Rebooting is needed since a kernel upgrade is performed.
 
 It should also be possible to run `bootstrap.sh` followed by ``bootstrap2.sh` in any Ubuntu machine.
 
+Then copy config.json.template to config.json and edit the settings if necesary.
+
+
 
 ## AWS EC2
 
