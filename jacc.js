@@ -570,7 +570,7 @@
 
         async.series([
           // Delete the redis entry
-          function(fn){ this.deleteProxy(fn); }.bind(this),
+          function(fn){ this._deleteProxy(fn); }.bind(this),
 
           // Get the container ID for the name
           function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
