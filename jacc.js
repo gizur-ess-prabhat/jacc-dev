@@ -572,9 +572,6 @@
         this._isset(this._name, '_delete: name not set!');
 
         async.series([
-          // Delete the redis entry
-          function(fn){ this._deleteProxy(fn); }.bind(this),
-
           // Get the container ID for the name
           function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
 
@@ -655,6 +652,11 @@
             }
             fn(null, 'fith func');
           }.bind(this),
+
+          // Delete the redis entry
+          function(fn){ this._deleteProxy(fn); }.bind(this),
+
+          // Finish async series
           function(fn) {
             helpers.logDebug('delete: end of series');
             if(asyncCallback !== undefined) {
