@@ -138,6 +138,43 @@
 
     };
 
+  
+    // _deleteProxy
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Delete proxy for this._name
+    //
+
+    this._deleteProxy = function(asyncCallback){
+
+      helpers.logDebug('_deleteProxy: Start...'+this._name);
+
+      this._isset(this._name, '_deleteProxy: this._name not set');
+
+      var redis_client = redis.createClient();
+
+      redis_client.on("connect", function () {
+
+          helpers.logDebug('_deleteProxy: redis connected - looking for '+this._name);
+
+          redis_client.del("frontend:"+this._name, function(err, res) {
+            helpers.logDebug('_deleteProxy: '+this._name+' result  '+res);
+
+            redis_client.quit();
+
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, '_deleteProxy completed');
+            }
+          }.bind(this));
+      }.bind(this));
+
+      // redis error management
+      redis_client.on("error", function (err) {
+          helpers.logErr("Redis error: " + err);
+      });
+
+    };
+
 
     // updateProxy
     //-------------------------------------------------------------------------------------------------
@@ -532,6 +569,9 @@
         helpers.logDebug('delete: Start...');
 
         async.series([
+          // Delete the redis entry
+          function(fn){ this.deleteProxy(fn); }.bind(this),
+
           // Get the container ID for the name
           function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
 
@@ -652,7 +692,7 @@
             helpers.logDebug('inspect: '+chunk);
             try {
               this._settings = JSON.parse(chunk);
-              this._imageID  = this._settings;
+              this._imageID  = this._settings.Config.Image;
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
             }
