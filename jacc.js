@@ -93,6 +93,7 @@
           process.exit();
         }        
       }
+      return true;
     };
 
 
