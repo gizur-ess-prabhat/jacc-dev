@@ -695,13 +695,13 @@
 
        helpers.logDebug('inspect: options - '+JSON.stringify(options));
        options.path = '/containers/'+this._containerID+'/json';
-       helpers.logDebug('inspect: options - '+JSON.stringify(options));
  
         this._dockerRemoteAPI(options, function(chunk) {
             helpers.logDebug('inspect: '+chunk);
             try {
               this._settings = JSON.parse(chunk);
               this._imageID  = this._settings.Image;
+              helpers.logDebug('inspect: this._settings='+JSON.stringify(this._settings));
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
             }
