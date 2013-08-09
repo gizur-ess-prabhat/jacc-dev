@@ -701,7 +701,7 @@
             helpers.logDebug('inspect: '+chunk);
             try {
               this._settings = JSON.parse(chunk);
-              this._imageID  = this._settings.Config.Image;
+              this._imageID  = this._settings.Image;
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
             }
