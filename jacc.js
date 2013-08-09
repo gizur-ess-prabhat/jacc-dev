@@ -632,6 +632,7 @@
     this._inspect = function(asyncCallback){
 
         if (!this._isset(this._containerID, 'inspect: this._containerID not set', true)) {
+          asyncCallback(null,'inspect not possible without continer');
           return;
         }
 
