@@ -623,7 +623,7 @@
 
     this._inspect = function(asyncCallback){
 
-        this._isset(this._containerID, 'inspect: this._containerID not set');
+        this._isset(this._containerID, 'inspect: this._containerID not set', true);
 
         var options = {
           path:     '/containers/'+this._containerID+'/json',
@@ -637,7 +637,6 @@
               this._imageID  = this._settings;
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
-              //process.exit();              
             }
         }.bind(this),
         null,
