@@ -413,7 +413,7 @@
 
         this._dockerRemoteAPI(options, 
           function(chunk) {
-            helpers.logDebug('build: ' + chunk);
+            console.log('build: ' + chunk);
 
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
@@ -587,7 +587,7 @@
           // stop the container
           function(fn) {
             helpers.logDebug('delete: stop container with container ID '+this._containerID);
-            if (this._isset(this._containerID, "Container missing can't stop", true)) {
+            if (this._isset(this._containerID, "Container missing, can't stop", true)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'/stop?t=10',
@@ -610,7 +610,7 @@
           // Delete the container
           function(fn) {
             helpers.logDebug('delete: remove container with container ID '+this._containerID);
-            if (this._isset(this._containerID, "Container missing can't delete", true)) {
+            if (this._isset(this._containerID, "Container missing, can't delete", true)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'?v=1',
