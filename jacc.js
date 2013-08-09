@@ -83,11 +83,15 @@
       return (a === "" || a === undefined || a === null || a === [] || a === {});
     };
 
-    this._isset = function(a, message){
+    this._isset = function(a, message, dontexit){
       helpers.logDebug('_isset: checking - ' + a );
       if (this._notset(a)) {
         console.log(message);
-        process.exit();        
+        if(dontexit !== undefined && dontexit) {
+          return;
+        } else {
+          process.exit();
+        }        
       }
     };
 
