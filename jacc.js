@@ -80,7 +80,7 @@
     //======================================================================
 
     this._isset2 = function(a, message){
-      return (a !== undefined && a !== "" && a !== null && a !== [] && a !== {});
+      return (a !== undefined && a !== null && a !== "" && a !== [] && a !== {});
     };
 
     this._isset = function(a, message, dontexit){
@@ -120,6 +120,7 @@
 
           redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
             helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res);
+            helpers.logDebug('_proxyGetContainerIDForName: typeof res' + typeof res);
             this._containerID = res;
 
             redis_client.quit();
