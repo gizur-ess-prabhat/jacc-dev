@@ -257,7 +257,8 @@
                   async.series([
                     function(fn) { this._inspect(fn); }.bind(this),
                     function(fn) {
-                      helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
+//                      helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
+                      helpers.logDebug(key+' - backend:'+this._settings);
  
                       // Print some info
                       console.log(key+' - backend:'+res+
@@ -279,7 +280,7 @@
               asyncCallback(null, '_proxyStatus completed');
             }
 
-          });
+          }.bind(this));
 
       }.bind(this));
 
