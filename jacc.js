@@ -85,7 +85,7 @@
 
     this._isset = function(a, message, dontexit){
       helpers.logDebug('_isset: checking - ' + a );
-      if (this._isset2(a)) {
+      if (!this._isset2(a)) {
         console.log(message);
         if(dontexit !== undefined && dontexit) {
           return;
