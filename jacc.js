@@ -693,9 +693,9 @@
           method:   'GET'
         };
 
-       helpers.logDebug('inspect: options - '+JSON.strinify(options));
+       helpers.logDebug('inspect: options - '+JSON.stringify(options));
        options.path = '/containers/'+this._containerID+'/json';
-       helpers.logDebug('inspect: options - '+JSON.strinify(options));
+       helpers.logDebug('inspect: options - '+JSON.stringify(options));
  
         this._dockerRemoteAPI(options, function(chunk) {
             helpers.logDebug('inspect: '+chunk);
