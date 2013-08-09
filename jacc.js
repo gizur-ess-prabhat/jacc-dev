@@ -627,7 +627,9 @@
 
     this._inspect = function(asyncCallback){
 
-        this._isset(this._containerID, 'inspect: this._containerID not set', true);
+        if (!this._isset(this._containerID, 'inspect: this._containerID not set', true)) {
+          return;
+        }
 
         var options = {
           path:     '/containers/'+this._containerID+'/json',
