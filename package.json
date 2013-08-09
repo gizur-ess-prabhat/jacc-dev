@@ -13,6 +13,7 @@
   },
   "author": "Jonas Colmsjö <jonas@gizur.com>",
   "main": "build/jacc.min.js",
+  "bin": "./jacc.js",
   "dependencies": {
     "redis": "0.8.4",
     "optimist": "0.6.0",
