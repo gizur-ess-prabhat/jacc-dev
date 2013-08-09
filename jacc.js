@@ -88,8 +88,10 @@
       if (!this._isset2(a)) {
         console.log(message);
         if(dontexit !== undefined && dontexit) {
+          helpers.logDebug('_isset: returning false ');
           return false;
         } else {
+          helpers.logDebug('_isset: exiting process');
           process.exit();
         }        
       }
