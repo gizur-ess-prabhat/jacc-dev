@@ -120,7 +120,6 @@
 
           redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
             helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res);
-            helpers.logDebug('_proxyGetContainerIDForName: typeof res ' + typeof res + ' JSON: '+JSON.stringify(res));
             this._containerID = res;
 
             redis_client.quit();
@@ -542,6 +541,7 @@
             if (this._isset(this._containerID, "Container missing, can't inspect", true)) {
               this._inspect(fn);
             }
+            fn(null, 'second func');
           }.bind(this),
 
           // stop the container
@@ -564,6 +564,7 @@
                 null,
                 fn);
             }
+            fn(null, 'third func');
           }.bind(this),
 
           // Delete the container
@@ -586,6 +587,7 @@
                 null,
                 fn);
             }
+            fn(null, 'fourth func');
           }.bind(this),
 
           // Delete the image
@@ -608,6 +610,7 @@
                 null,
                 fn);
             }
+            fn(null, 'fith func');
           }.bind(this),
           function(fn) {
             helpers.logDebug('delete: end of series');
