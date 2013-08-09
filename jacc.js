@@ -84,7 +84,7 @@
     };
 
     this._isset = function(a, message, dontexit){
-      helpers.logDebug('_isset: checking - ' + a );
+      helpers.logDebug('_isset: checking - ' + a + ' (exit message:'+message+')');
       if (!this._isset2(a)) {
         console.log(message);
         if(dontexit !== undefined && dontexit) {
@@ -120,7 +120,7 @@
 
           redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
             helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res);
-            helpers.logDebug('_proxyGetContainerIDForName: typeof res' + typeof res + ' JSON: '+JSON.stringify(res));
+            helpers.logDebug('_proxyGetContainerIDForName: typeof res ' + typeof res + ' JSON: '+JSON.stringify(res));
             this._containerID = res;
 
             redis_client.quit();
