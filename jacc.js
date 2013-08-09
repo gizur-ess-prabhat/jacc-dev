@@ -257,8 +257,7 @@
                   async.series([
                     function(fn) { this._inspect(fn); }.bind(this),
                     function(fn) {
-//                      helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
-                      helpers.logDebug(key+' - backend:'+this._settings);
+                      helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
  
                       // Print some info
                       console.log(key+' - backend:'+res+
@@ -269,7 +268,7 @@
                       fn(null, '_proxyStatus partial');
                     }.bind(this)
                   ]);
-                });
+                }.bind(this));
             });
 
             helpers.logDebug('_proxyStatus: close redis connection...');
