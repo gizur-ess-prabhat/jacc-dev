@@ -594,7 +594,7 @@
           // Delete the image
           function(fn) {
             helpers.logDebug('delete: remove image with image ID '+this._imageID);
-            if (this._isset(this._imageID, "Image missing,cant remove",true)) {
+            if (this._isset(this._imageID, "Image missing, can't remove",true)) {
 
               var options = {
                 path:     '/images/'+this._imageID,
@@ -611,7 +611,13 @@
                 null,
                 fn);
             }
-          }.bind(this)
+          }.bind(this),
+          function(fn) {
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'delete finished (inner)');
+            }
+            fn(null, 'delete finished (outer)');
+          }
           ]);
 
 
