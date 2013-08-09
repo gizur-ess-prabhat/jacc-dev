@@ -119,7 +119,7 @@
           helpers.logDebug('_proxyGetContainerIDForName: redis connected - looking for '+this._name);
 
           redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
-            helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res);
+            helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res+' error: '+err);
             this._containerID = res;
 
             redis_client.quit();
