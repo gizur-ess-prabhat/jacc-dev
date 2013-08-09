@@ -41,7 +41,7 @@
     var hostname,
         port;
 
-    nconf.use('file', { file: __dirname + '/config.json' });
+    nconf.use('file', { file: __dirname + '/jacc_config.json' });
     nconf.load();
 
     this.hostname = nconf.get('hostname');

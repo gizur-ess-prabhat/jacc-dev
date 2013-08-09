@@ -93,4 +93,4 @@ sudo apt-get install -y redis-server
 
 cd ~
 git clone https://github.com/colmsjo/jacc.git
-cd jacc && sudo npm install --production
+cd jacc && sudo npm install --production -g

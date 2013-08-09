@@ -37,11 +37,16 @@ The repo comes with a Vagrantfile. Installation of a test/development environmen
 `vagrant up vb`. Then reboot the machine with `vagrant halt vb` followed by ``vagrant up vb`. 
 Rebooting is needed since a kernel upgrade is performed.
 
-It should also be possible to run `bootstrap.sh` followed by ``bootstrap2.sh` in any Ubuntu machine.
+It is also be possible to run `bootstrap.sh` followed by ``bootstrap2.sh` in any Ubuntu machine.
 
-Then copy config.json.template to config.json and edit the settings if necesary.
+Then goto the folder where npm installs the modules. This is here if the vagrant file above was
+used: `/usr/lib/node_modules/jacc/`
+
+ * Copy jacc_config.json.template to jacc_config.json and edit the settings if necesary.
+ * Copy hipache_config.json.template to hipache_config.json and edit the settings if necesary.
 
 
+If you already have docker, hipache and node installed then just do `npm install --production -g`
 
 ## AWS EC2
 
