@@ -566,7 +566,9 @@
 
     this._delete = function(asyncCallback){
 
-        helpers.logDebug('delete: Start...');
+        helpers.logDebug('delete: '+this._name+' Start...');
+
+        this._isset(this._name, '_delete: name not set!');
 
         async.series([
           // Delete the redis entry
