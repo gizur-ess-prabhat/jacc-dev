@@ -91,6 +91,7 @@
           process.exit();
         }        
       }
+      helpers.logDebug('_isset: returning true ');
       return true;
     };
 
@@ -631,6 +632,8 @@
 
     this._inspect = function(asyncCallback){
 
+        helpers.logDebug('inspect: start');
+
         if (!this._isset(this._containerID, 'inspect: this._containerID not set', true)) {
           helpers.logDebug('inspect: not set: ' + this._containerID);
           asyncCallback(null,'inspect not possible without continer');
@@ -654,6 +657,9 @@
         null,
         null,
         asyncCallback);
+
+        helpers.logDebug('inspect: end');
+
     };
 
 
