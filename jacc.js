@@ -575,6 +575,9 @@
           // Get the container ID for the name
           function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
 
+         // Get the container ID for the name
+          function(fn){ this._inspect(fn); }.bind(this),
+
           // Fetch the container settings
           function(fn) {
             helpers.logDebug('delete: inspect container with container ID '+this._containerID);
@@ -692,17 +695,12 @@
           path:     '/containers/'+this._containerID+'/json',
           method:   'GET'
         };
-
-       helpers.logDebug('inspect: options - '+JSON.stringify(options));
-       options.path = '/containers/'+this._containerID+'/json';
  
         this._dockerRemoteAPI(options, function(chunk) {
             helpers.logDebug('inspect: '+chunk);
             try {
               this._settings = JSON.parse(chunk);
               this._imageID  = this._settings.Image;
-              helpers.logDebug('inspect: this._settings='+prettyjson.render(this._settings));
-              helpers.logDebug('inspect: this._imageID='+this._imageID);
             } catch (e) {
               helpers.logErr('inspect: error fetching data for - ' + this._containerID);
             }
