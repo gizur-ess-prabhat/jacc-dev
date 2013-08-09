@@ -578,7 +578,7 @@
           // Fetch the container settings
           function(fn) {
             helpers.logDebug('delete: inspect container with container ID '+this._containerID);
-            if (this._isset(this._containerID, "Container missing, can't inspect", true)) {
+            if (this._isset(this._containerID, "Container "+this._containerID+" missing, can't inspect", true)) {
               this._inspect(fn);
             }
             fn(null, 'second func');
@@ -587,7 +587,7 @@
           // stop the container
           function(fn) {
             helpers.logDebug('delete: stop container with container ID '+this._containerID);
-            if (this._isset(this._containerID, "Container missing, can't stop", true)) {
+            if (this._isset(this._containerID, "Container "+this._containerID+" missing, can't stop", true)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'/stop?t=10',
@@ -610,7 +610,7 @@
           // Delete the container
           function(fn) {
             helpers.logDebug('delete: remove container with container ID '+this._containerID);
-            if (this._isset(this._containerID, "Container missing, can't delete", true)) {
+            if (this._isset(this._containerID, "Container "+this._containerID+" missing, can't delete", true)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'?v=1',
@@ -633,7 +633,7 @@
           // Delete the image
           function(fn) {
             helpers.logDebug('delete: remove image with image ID '+this._imageID);
-            if (this._isset(this._imageID, "Image missing, can't remove",true)) {
+            if (this._isset(this._imageID, "Image "+this._imageID+" missing, can't remove",true)) {
 
               var options = {
                 path:     '/images/'+this._imageID,
