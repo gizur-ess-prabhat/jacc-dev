@@ -46,7 +46,7 @@ used: `/usr/lib/node_modules/jacc/`
  * Copy hipache_config.json.template to hipache_config.json and edit the settings if necesary.
 
 
-If you already have docker, hipache and node installed then just do `npm install --production -g`
+If you already have docker, hipache and node installed then just do `sudo npm install --production -g`
 
 ## AWS EC2
 
@@ -99,6 +99,6 @@ A: Clone the repo manually:
 ```
 cd ~
 git clone https://github.com/colmsjo/jacc.git
-cd jacc && sudo npm install --production
+cd jacc && sudo npm install --production -g
 ```
 
