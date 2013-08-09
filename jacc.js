@@ -79,13 +79,9 @@
     // helpers
     //======================================================================
 
-    this._isset2 = function(a, message){
-      return (a !== undefined && a !== null && a !== "" && a !== [] && a !== {});
-    };
-
     this._isset = function(a, message, dontexit){
       helpers.logDebug('_isset: checking - ' + a + ' (exit message:'+message+')');
-      if (!this._isset2(a)) {
+      if (!helpers.isset(a)) {
         console.log(message);
         if(dontexit !== undefined && dontexit) {
           helpers.logDebug('_isset: returning false ');
@@ -550,7 +546,7 @@
           // stop the container
           function(fn) {
             helpers.logDebug('delete: stop container with container ID '+this._containerID);
-            if (this._isset(this._containerID, "Container missing can't delete", true)) {
+            if (this._isset(this._containerID, "Container missing can't stop", true)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'/stop?t=10',
@@ -572,7 +568,7 @@
           // Delete the container
           function(fn) {
             helpers.logDebug('delete: remove container with container ID '+this._containerID);
-            if (this._isset2(this._containerID)) {
+            if (this._isset(this._containerID, "Container missing can't delete", true)) {
 
               var options = {
                 path:     '/containers/'+this._containerID+'?v=1',
