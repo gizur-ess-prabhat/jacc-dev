@@ -88,7 +88,7 @@
       if (!this._isset2(a)) {
         console.log(message);
         if(dontexit !== undefined && dontexit) {
-          return;
+          return false;
         } else {
           process.exit();
         }        
