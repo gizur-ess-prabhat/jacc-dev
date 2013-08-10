@@ -16,3 +16,6 @@ test:
 
 lint:
 	./vendor/bin/phpcs --standard=Zend *.php
+
+build:
+	tar -cf webapp.tar *
