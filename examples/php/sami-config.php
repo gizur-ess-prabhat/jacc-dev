@@ -1,3 +1,3 @@
 <?php
 
-return new Sami\Sami('./*.php');
+return new Sami\Sami('.');
