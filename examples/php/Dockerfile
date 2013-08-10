@@ -35,18 +35,16 @@ RUN apt-get install -y git wget
 # Install Apache and PHP
 #
 
-RUN apt-get install php5 -y
+RUN apt-get install apache2 php5 -y
 
 
 # -----------------------------------------------------------------------------------
 # SETUP THE APP
 #
 
-# Bundle PHP app source
-ADD webapp /var/www
+# Bundle everything and install in root
+ADD . /
 
-# Bundle the apache settings
-ADD container-conf /
 
 EXPOSE  8080
 CMD ["apachectl", "start"]
