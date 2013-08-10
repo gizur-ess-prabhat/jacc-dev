@@ -35,7 +35,7 @@ RUN apt-get install -y git wget
 # Install Apache and PHP
 #
 
-#RUN apt-get install -y apache php
+RUN apt-get install php5 -y
 
 
 # -----------------------------------------------------------------------------------
@@ -49,4 +49,4 @@ ADD . /src
 # RUN cd /src; npm install
 
 EXPOSE  8080
-# CMD ["node", "/src/index.js"]
+CMD ["/bin/bash"]
