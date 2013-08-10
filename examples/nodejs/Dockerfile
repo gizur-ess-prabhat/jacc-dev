@@ -8,45 +8,20 @@
 #
 # VERSION               0.0.1
 
-FROM     ubuntu
-MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
+# DOCKER-VERSION 0.3.4
+FROM    centos:6.4
 
-# -----------------------------------------------------------------------------------
-# PREPARATIONS 
-#
+# Enable EPEL for Node.js
+RUN     rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+#ADD epel-release-6-8.noarch.rpm /
+#RUN     rpm -Uvh /epel-release-6-8.noarch.rpm
 
-# sudo will complain about unknown host otherwise
-RUN echo "127.0.0.1\t`hostname`" >> /etc/hosts
+# Install Node.js and npm
+# RUN     yum install -y npm-1.2.17-5.el6
 
-# make sure the package repository is up to date
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
-RUN apt-get update -y
-
-
-#
-# Install some nice tools
-#
-
-RUN apt-get install -y git wget
-
-
-#
-# Install NodeJs
-#
-
-RUN apt-get update -y
-RUN apt-get install -y python g++ make software-properties-common
-RUN apt-get install -y --reinstall python-software-properties
-RUN dpkg-reconfigure python-software-properties
-RUN add-apt-repository -y ppa:chris-lea/node.js
-RUN apt-get update -y
-RUN apt-get install -y nodejs
-
-
-# -----------------------------------------------------------------------------------
-# Setup the app
-#
+RUN wget http://kojipkgs.fedoraproject.org//packages/nodejs-ansi/0.1.2/7.el6.1/noarch/nodejs-ansi-0.1.2-7.el6.1.noarch.rpm
+RUN yum --enablerepo="epel" install -y npm ./nodejs-ansi-0.1.2-7.el6.1.noarch.rpm
 
 # Bundle app source
 ADD . /src
@@ -56,3 +31,4 @@ RUN cd /src; npm install
 
 EXPOSE  8080
 CMD ["node", "/src/index.js"]
+
