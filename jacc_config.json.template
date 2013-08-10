@@ -1,5 +1,5 @@
 {
   "hostname" : "localhost",
   "port" : 4243,
-  "logging" : "debug"
+  "logging" : "warning"
 }

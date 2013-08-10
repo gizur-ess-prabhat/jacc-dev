@@ -64,8 +64,8 @@ Vagrant.configure("2") do |config|
  # Had problems with the nameserver, this helped
  #
 
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-  end
+#  config.vm.provider :virtualbox do |vb|
+#    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+#  end
 
 end

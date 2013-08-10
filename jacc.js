@@ -41,7 +41,7 @@
     var hostname,
         port;
 
-    nconf.use('file', { file: __dirname + '/config.json' });
+    nconf.use('file', { file: __dirname + '/jacc_config.json' });
     nconf.load();
 
     this.hostname = nconf.get('hostname');
@@ -72,11 +72,109 @@
         _containerID   = "",
         _name          = "",
         _containerPort,
+        _use_export    = false,
         _settings      = {};
+
+
+    // helpers
+    //======================================================================
+
+    this._isset = function(a, message, dontexit){
+      helpers.logDebug('_isset: checking - ' + a + ' (exit message:'+message+')');
+      if (!helpers.isset(a)) {
+        console.log(message);
+        if(dontexit !== undefined && dontexit) {
+          helpers.logDebug('_isset: returning false ');
+          return false;
+        } else {
+          helpers.logDebug('_isset: exiting process');
+          process.exit();
+        }        
+      }
+      helpers.logDebug('_isset: returning true ');
+      return true;
+    };
 
 
     // hipache functions
     //======================================================================
+
+
+    // _proxyGetContainerIDForName
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Get the this._containerID based on this._name
+    //
+
+    this._proxyGetContainerIDForName = function(asyncCallback){
+
+      helpers.logDebug('_proxyGetContainerIDForName: Start...'+this._name);
+
+      this._isset(this._name, '_proxyGetContainerIDForName: this._name not set');
+
+      var redis_client = redis.createClient();
+
+      redis_client.on("connect", function () {
+
+          helpers.logDebug('_proxyGetContainerIDForName: redis connected - looking for '+this._name);
+
+          redis_client.lrange("frontend:"+this._name, 0, 0, function(err, res) {
+            helpers.logDebug('_proxyGetContainerIDForName: hipache entry - '+"frontend:"+this._name+'='+res+' error: '+err);
+            this._containerID = res;
+
+            redis_client.quit();
+
+            helpers.logDebug('_proxyGetContainerIDForName: end');
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, '_proxyGetContainerIDForName completed');
+            }
+          }.bind(this));
+      }.bind(this));
+
+      // redis error management
+      redis_client.on("error", function (err) {
+          helpers.logErr("Redis error: " + err);
+      });
+
+    };
+
+  
+    // _deleteProxy
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Delete proxy for this._name
+    //
+
+    this._deleteProxy = function(asyncCallback){
+
+      helpers.logDebug('_deleteProxy: Start...'+this._name);
+
+      this._isset(this._name, '_deleteProxy: this._name not set');
+
+      var redis_client = redis.createClient();
+
+      redis_client.on("connect", function () {
+
+          helpers.logDebug('_deleteProxy: redis connected - looking for '+this._name);
+
+          redis_client.del("frontend:"+this._name, function(err, res) {
+            helpers.logDebug('_deleteProxy: '+this._name+' result  '+res);
+
+            redis_client.quit();
+
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, '_deleteProxy completed');
+            }
+          }.bind(this));
+      }.bind(this));
+
+      // redis error management
+      redis_client.on("error", function (err) {
+          helpers.logErr("Redis error: " + err);
+      });
+
+    };
+
 
     // updateProxy
     //-------------------------------------------------------------------------------------------------
@@ -91,13 +189,25 @@
       var redis_client = redis.createClient();
 
       redis_client.on("connect", function () {
-          redis_client.rpush("frontend:"+this._name, this._name, redis.print);
+          redis_client.rpush("frontend:"+this._name, this._containerID, 
+            function(err, res) {
+              if(err) {
+                helpers.logErr('ERROR! updateProxy failed when writing to Redis');
+              }
+              helpers.logDebug('_updateProxy: wrote frontend - '+res);
+            });
 
           var backend = "http://"+this._settings.NetworkSettings.IPAddress+":"+this._containerPort;
 
-          redis_client.rpush("frontend:"+this._containerID, 
+          redis_client.rpush("frontend:"+this._name, 
                              backend, 
-                             redis.print);
+                              function(err, res) {
+                                if(err) {
+                                  helpers.logErr('ERROR! updateProxy failed when writing to Redis');
+                                }
+                                helpers.logDebug('_updateProxy: wrote frontend - '+res);
+
+                              });
 
           redis_client.quit();
 
@@ -122,6 +232,7 @@
     //
     // Print contents of redis database
     //
+    // NOTE: Currently only fetching status for the first backend
 
     this._proxyStatus = function(asyncCallback){
 
@@ -131,13 +242,36 @@
 
       redis_client.on("connect", function () {
 
+          helpers.logDebug('_proxyStatus: redis connected...');
+
           redis_client.keys("frontend*", function(err, keys) {
+            helpers.logDebug('_proxyStatus: keys - '+keys);
+
             keys.forEach(function (key,i) {
                 redis_client.lrange(key, 0,-1, function(err, res) {
-                  console.log(key+' - backend:'+res);
-                });
+
+                  helpers.logDebug('_proxyStatus: hipache entry:'+key+' res:'+res);
+
+                  // Fetch the settings for the container
+                  this._containerID = res[0];
+                  async.series([
+                    function(fn) { this._inspect(fn); }.bind(this),
+                    function(fn) {
+                      helpers.logDebug(key+' - backend:'+prettyjson.render(this._settings));
+ 
+                      // Print some info
+                      console.log(key+' - backend:'+res+
+                                  ' IP:'+((this._settings !== undefined) ? 
+                                    this._settings.NetworkSettings.IPAddress : 
+                                    'not set!') );
+
+                      fn(null, '_proxyStatus partial');
+                    }.bind(this)
+                  ]);
+                }.bind(this));
             });
 
+            helpers.logDebug('_proxyStatus: close redis connection...');
             redis_client.quit();
 
             helpers.logDebug('_proxyStatus: end');
@@ -145,8 +279,7 @@
               asyncCallback(null, '_proxyStatus completed');
             }
 
-          });
-
+          }.bind(this));
 
       }.bind(this));
 
@@ -209,6 +342,57 @@
     };
 
 
+    // import
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -H "Content-type: application/tar" --data-binary @webapp.tar http://localhost:4243/build
+    //
+
+    this._import = function(asyncCallback){
+
+        helpers.logDebug('import: Start...');
+
+        var options = {
+          path: '/images/create?fromSrc=-',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/tar',
+          }
+        };
+
+        this._dockerRemoteAPI(options, 
+          function(chunk) {
+            helpers.logDebug('import: ' + chunk);
+
+            this._imageID = JSON.parse(chunk).status;
+          }.bind(this),
+          function() {
+            this._isset(this._imageID, 'Import failed! No image was created.');
+            helpers.logDebug('import: res received end - image ID: ' + this._imageID);
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'image:'+this._imageID);
+            }      
+          }.bind(this),
+          function(req) {
+            // write data to the http.ClientRequest (which is a stream) returned by http.request() 
+            var fs = require('fs');
+            var stream = fs.createReadStream('webapp.export.tar');
+
+            // Close the request when the stream is closed
+            stream.on('end', function() {
+              helpers.logDebug('import: stream received end');
+              req.end();
+            }.bind(this));
+
+            // send the data
+            stream.pipe(req);
+          }.bind(this),
+          asyncCallback);
+
+        helpers.logDebug('import: Data sent...');
+    };
+
+
     // build
     //-------------------------------------------------------------------------------------------------
     //
@@ -220,7 +404,7 @@
         helpers.logDebug('build: Start...');
 
         var options = {
-          path: '/build',
+          path: '/build?nocache',
           method: 'POST',
           headers: {
             'Content-Type': 'application/tar',
@@ -229,7 +413,7 @@
 
         this._dockerRemoteAPI(options, 
           function(chunk) {
-            helpers.logDebug('build: ' + chunk);
+            console.log('build: ' + chunk);
 
             // The last row looks like this 'Successfully built 3df239699c83'
             if (chunk.slice(0,18) === 'Successfully built') {
@@ -238,10 +422,7 @@
             }
           }.bind(this),
           function() {
-            if(this._imageID === "" || this._imageID === undefined) {
-              helpers.logErr('Build failed! No image was created.');
-              process.exit();
-            }
+            this._isset(this._imageID, 'Build failed! No image was created.');
             helpers.logDebug('build: res received end - image ID: ' + this._imageID);
             if(asyncCallback !== undefined) {
               asyncCallback(null, 'image:'+this._imageID);
@@ -276,8 +457,10 @@
 
     this._createContainer = function(asyncCallback){
 
-        if (this._imageID === "") {
-          helpers.logErr('createContainer: this._imageID not set');
+        this._isset(this._imageID, 'createContainer: this._imageID not set');
+
+        if (this._use_export !== undefined && this._use_export.length === 0) {
+          console.log('create container requires a command - for instance --use_export="node /src/index.js"');
           process.exit();        
         }
 
@@ -300,6 +483,10 @@
          "VolumesFrom":""
         };
 
+        if (this._use_export !== undefined && this._use_export.length > 0) {
+          container.cmd = [this._use_export];
+        }
+
         var options = {
           path: '/containers/create',
           method: 'POST'
@@ -312,13 +499,19 @@
               helpers.logInfo('createContainer: ' + chunk);
 
               // The result should look like this '{"Id":"c6bfd6da99d3"}'
-              this._containerID = JSON.parse(chunk).Id;            
-              helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
+              try {
+                this._containerID = JSON.parse(chunk).Id;            
+                helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
+              } catch (e) {
+                  console.log('Create container failed: '+chunk);
+                  process.exit();          
+              }
           }.bind(this),
           null,
           function(req) {
               helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
               req.write(JSON.stringify(container));
+              req.end();
           }.bind(this),
           asyncCallback);
 
@@ -336,10 +529,7 @@
 
         helpers.logDebug('start: Start...');
 
-        if (this._containerID === "") {
-          helpers.logErr('start: this._containerID not set');
-          process.exit();        
-        }
+        this._isset(this._containerID, 'start: this._containerID not set');
 
         var binds = {
             "Binds":["/tmp:/tmp"]
@@ -360,10 +550,127 @@
           function(req) {
             helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
             req.write(JSON.stringify(binds));
+            req.end();
           }.bind(this),
           asyncCallback);
 
         helpers.logDebug('start: Data sent...');        
+    };
+
+
+    // delete
+    //-------------------------------------------------------------------------------------------------
+    //
+    // Equivalent of: curl -d '' http://localhost:4243/containers/c6bfd6da99d3/stop?t=10
+    //
+
+    this._delete = function(asyncCallback){
+
+        helpers.logDebug('delete: '+this._name+' Start...');
+
+        this._isset(this._name, '_delete: name not set!');
+
+        async.series([
+          // Get the container ID for the name
+          function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
+
+         // Get the container ID for the name
+          function(fn){ this._inspect(fn); }.bind(this),
+
+          // Fetch the container settings
+          function(fn) {
+            helpers.logDebug('delete: inspect container with container ID '+this._containerID);
+            if (this._isset(this._containerID, "Container "+this._containerID+" missing, can't inspect", true)) {
+              this._inspect(fn);
+            }
+            fn(null, 'second func');
+          }.bind(this),
+
+          // stop the container
+          function(fn) {
+            helpers.logDebug('delete: stop container with container ID '+this._containerID);
+            if (this._isset(this._containerID, "Container "+this._containerID+" missing, can't stop", true)) {
+
+              var options = {
+                path:     '/containers/'+this._containerID+'/stop?t=10',
+                method:   'POST'
+              };
+
+              helpers.logDebug('delete: stop container - ' + this._containerID);
+
+              this._dockerRemoteAPI(options, 
+                function(chunk) {
+                  helpers.logDebug('delete: ' + chunk);
+                }.bind(this),
+                null,
+                null,
+                fn);
+            }
+            fn(null, 'third func');
+          }.bind(this),
+
+          // Delete the container
+          function(fn) {
+            helpers.logDebug('delete: remove container with container ID '+this._containerID);
+            if (this._isset(this._containerID, "Container "+this._containerID+" missing, can't delete", true)) {
+
+              var options = {
+                path:     '/containers/'+this._containerID+'?v=1',
+                method:   'DELETE'
+              };
+
+              helpers.logDebug('delete: remove container - ' + this._containerID);
+
+              this._dockerRemoteAPI(options, 
+                function(chunk) {
+                  helpers.logDebug('delete: ' + chunk);
+                }.bind(this),
+                null,
+                null,
+                fn);
+            }
+            fn(null, 'fourth func');
+          }.bind(this),
+
+          // Delete the image
+          function(fn) {
+            helpers.logDebug('delete: remove image with image ID '+this._imageID);
+            if (this._isset(this._imageID, "Image "+this._imageID+" missing, can't remove",true)) {
+
+              var options = {
+                path:     '/images/'+this._imageID,
+                method:   'DELETE'
+              };
+
+              helpers.logDebug('delete: remove image - ' + this._imageID);
+
+              this._dockerRemoteAPI(options, 
+                function(chunk) {
+                  helpers.logDebug('delete: ' + chunk);
+                }.bind(this),
+                null,
+                null,
+                fn);
+            }
+            fn(null, 'fith func');
+          }.bind(this),
+
+          // Delete the redis entry
+          function(fn){ this._deleteProxy(fn); }.bind(this),
+
+          // Finish async series
+          function(fn) {
+            helpers.logDebug('delete: end of series');
+            if(asyncCallback !== undefined) {
+              asyncCallback(null, 'delete finished (inner)');
+            }
+            helpers.logDebug('delete: end of series again');
+            fn(null, 'delete finished (outer)');
+          }
+          ]);
+
+
+        helpers.logDebug('delete: Data sent...');        
     };
 
 
@@ -374,26 +681,39 @@
     //
 
     this._inspect = function(asyncCallback){
-        if (this._containerID === "") {
-          helpers.logErr('inspect: this._containerID not set');
-          process.exit();        
+
+        helpers.logDebug('inspect: start');
+
+        if (!this._isset(this._containerID, 'inspect: this._containerID not set', true)) {
+          helpers.logDebug('inspect: not set: ' + this._containerID);
+          asyncCallback(null,'inspect not possible without continer');
+          return;
         }
 
         var options = {
           path:     '/containers/'+this._containerID+'/json',
           method:   'GET'
         };
-
+ 
         this._dockerRemoteAPI(options, function(chunk) {
-            this._settings = JSON.parse(chunk);
+            helpers.logDebug('inspect: '+chunk);
+            try {
+              this._settings = JSON.parse(chunk);
+              this._imageID  = this._settings.Image;
+            } catch (e) {
+              helpers.logErr('inspect: error fetching data for - ' + this._containerID);
+            }
         }.bind(this),
         null,
         null,
         asyncCallback);
+
+        helpers.logDebug('inspect: end');
+
     };
 
 
-    // inspect
+    // logs
     //-------------------------------------------------------------------------------------------------
     //
     // Get the logs of the started container (should show the current date since that's all the container does)
@@ -401,10 +721,7 @@
     //
 
     this._logs = function(asyncCallback){
-        if (this._containerID === "" || this._containerID === undefined) {
-          helpers.logErr('logs: this._containerID not set');
-          process.exit();        
-        }
+        this._isset(this._containerID, 'logs: this._containerID not set');
 
         var options = {
           path:     '/containers/'+this._containerID+'/attach?logs=1&stream=0&stdout=1',
@@ -423,228 +740,6 @@
     };
 
 
-    // close
-    //-------------------------------------------------------------------------------------------------
-    //
-    // Clenaup
-    //
-
-    this._close = function(asyncCallback){
-
-      helpers.logDebug('close: Start...');
- 
-      if(asyncCallback !== undefined) {
-        asyncCallback(null, 'close completed');
-      }
-
-    };
-
-    // to be cleaned up
-    //-------------------------------------------------------------------------------------------------
-    //
-
-
-    this._build_old = function(asyncCallback){
-
-        helpers.logDebug('build.old: Start...');
-
-        var options2 = {
-          hostname: '',
-          port: 0,
-          path: '/build',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/tar',
-          }
-        };
-
-        options2.hostname = this.hostname;
-        options2.port = this.port;
-
-
-        helpers.logDebug('build.old: options2: ' + JSON.stringify(options2));
-
-        var req = http.request(options2, function(res) {
-          helpers.logDebug('build.old: STATUS: ' + res.statusCode);
-          helpers.logDebug('build.old: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('build.old: options: ' + JSON.stringify(options2));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
-            helpers.logInfo('build.old: ' + chunk);
-
-            // The last row looks like this 'Successfully built 3df239699c83'
-            if (chunk.slice(0,18) === 'Successfully built') {
-                this._imageID = chunk.slice(19,31);
-
-                helpers.logDebug('build.old: Build seams to be complete - image ID: ' + this._imageID );
-            }
-          }.bind(this));
-
-          res.on('end', function () {
-            helpers.logDebug('build.old: res received end - image ID: ' + this._imageID);
-            asyncCallback(null, 'image:'+this._imageID);
-          }.bind(this));
-
-        }.bind(this));
-
-        req.on('error', function(e) {
-            helpers.logErr('build.old: problem with request: ' + e.message);
-            process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('build.old: recieved end - : ' + e.message);
-        });
-
-        // write data to the http.ClientRequest (which is a stream) returned by http.request() 
-        var fs = require('fs');
-        var stream = fs.createReadStream('webapp.tar');
-
-        // Close the request when the stream is closed
-        stream.on('end', function() {
-          helpers.logDebug('build.old: stream received end');
-          req.end();
-        });
-
-        // send the data
-        stream.pipe(req);
-
-        helpers.logDebug('build.old: Data sent...');
-    };
-
-    this._start_old = function(asyncCallback){
-
-        helpers.logDebug('start: Start...');
-
-        if (this._containerID === "") {
-          helpers.logErr('start: this._containerID not set');
-          process.exit();        
-        }
-
-        var binds = {
-            "Binds":["/tmp:/tmp"]
-        };
-
-        var options = {
-          hostname: this.hostname,
-          port:     this.port,
-          path:     '/containers/'+this._containerID+'/start',
-          method:   'POST'
-        };
-
-        helpers.logDebug('start: path - ' + options.path);
-        helpers.logDebug('start: container - ' + this._containerID);
-
-        var req = http.request(options, function(res) {
-          helpers.logDebug('start: STATUS: ' + res.statusCode);
-          helpers.logDebug('start: HEADERS: ' + JSON.stringify(res.headers));
-          helpers.logDebug('start: options: ' + JSON.stringify(options));
-
-          res.setEncoding('utf8');
-
-          res.on('data', function (chunk) {
-            helpers.logInfo('start: ' + chunk);
-          });
-
-          res.on('end', function () {
-            helpers.logDebug('start: res received end');
-            asyncCallback(null, 'start completed');
-          });
-
-        }.bind(this));
-
-        req.on('error', function(e) {
-          helpers.logErr('start: problem with request: ' + e.message);
-          process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('start: recieved end - ' + e.message);
-        });
-
-        helpers.logDebug('start: JSON data - ' + JSON.stringify(binds));
-        req.write(JSON.stringify(binds));
-        req.end();
-
-        helpers.logDebug('start: Data sent...');        
-    };
-
-    this._createContainer_old = function(asyncCallback){
-
-        if (this._imageID === "") {
-          helpers.logErr('createContainer: this._imageID not set');
-          process.exit();        
-        }
-
-        var container = {
-         "Hostname":"",
-         "User":"",
-         "Memory":0,
-         "MemorySwap":0,
-         "AttachStdin":false,
-         "AttachStdout":true,
-         "AttachStderr":true,
-         "PortSpecs":null,
-         "Tty":false,
-         "OpenStdin":false,
-         "StdinOnce":false,
-         "Env":null,
-         "Dns":null,
-         "Image":this._imageID,
-         "Volumes":{},
-         "VolumesFrom":""
-        };
-
-        var options = {
-          hostname: this.hostname,
-          port: this.port,
-          path: '/containers/create',
-          method: 'POST'
-        };
-
-        helpers.logDebug('createContainer: Start...');
-
-        var req = http.request(options, function(res) {
-            helpers.logDebug('createContainer: STATUS: ' + res.statusCode);
-            helpers.logDebug('createContainer: HEADERS: ' + JSON.stringify(res.headers));
-            helpers.logDebug('createContainer: options: ' + JSON.stringify(options));
-
-            res.setEncoding('utf8');
-
-            res.on('data', function (chunk) {
-                helpers.logInfo('createContainer: ' + chunk);
-
-                // The result should look like this '{"Id":"c6bfd6da99d3"}'
-                this._containerID = JSON.parse(chunk).Id;            
-                helpers.logDebug('createContainer: container created with ID: ' + this._containerID);
-            }.bind(this));
-
-            res.on('end', function () {
-              helpers.logDebug('createContainer: res received end');
-              asyncCallback(null, 'container:'+this._containerID);
-            }.bind(this));
-
-        }.bind(this));
-
-        req.on('error', function(e) {
-          helpers.logErr('createContainer: problem with request: ' + e.message);
-          process.exit();
-        });
-
-        req.on('end', function(e) {
-            helpers.logDebug('createContainer: recieved end - ' + e.message);
-        });
-
-        helpers.logDebug('createContainer: JSON data - ' + JSON.stringify(container));
-        req.write(JSON.stringify(container));
-        req.end();
-
-        helpers.logDebug('createContainer: Data sent...');
-   };
-
-
     // push
     //-------------------------------------------------------------------------------------------------
     //
@@ -655,28 +750,30 @@
 
         helpers.logDebug('push: Start...');
 
-        if (argv.name === "" || argv.name === undefined) {
-          console.log('push requires the container name to be set - for instance --name=www.example.com!');
-          process.exit();        
-        }
+        this._isset(argv.name, 'push requires the container name to be set - for instance --name=www.example.com!');
+        this._isset(argv.port, 'push requires the container port to be set - for instance --port=8080!');
 
-        this._name = argv.name;
-
-        if (argv.port === "" || argv.port === undefined) {
-          console.log('push requires the container port to be set - for instance --port=8080!');
-          process.exit();        
-        }
-
+        this._name          = argv.name;
         this._containerPort = argv.port;
+        this._use_export    = argv.use_export;
 
         async.series([
-            function(fn){ this._build(fn); }.bind(this),
+            // Delete the container and image if it already exists
+            function(fn){ this._delete(fn); }.bind(this),
+
+            // Create new image and container
+            function(fn){
+              if(this._use_export === undefined) {
+                this._build(fn); 
+              } else {
+                this._import(fn);
+              }
+            }.bind(this),
             function(fn){ this._createContainer(fn); }.bind(this),
             function(fn){ this._start(fn); }.bind(this),
             function(fn){ this._inspect(fn); }.bind(this),
-            function(fn){ this._logs(fn); }.bind(this),
             function(fn){ this._updateProxy(fn); }.bind(this),
-            function(fn){ this._close(fn); }.bind(this),
+            function(fn){ this._logs(fn); }.bind(this)
         ],
         function(err, results){
           helpers.logDebug('push: results of async functions - ' + results);
@@ -709,7 +806,7 @@
             containers.forEach(function(container) {
               this._containerID = container.Id;
               this._inspect(asyncCallback);
-              this._settings.NetworkSettings.IPAddress
+              //this._settings.NetworkSettings.IPAddress
             });
 
             console.log('containers: ' + prettyjson.render(containers));
@@ -720,24 +817,36 @@
           asyncCallback);
 
         helpers.logDebug('containers: End...');  
-    }
+    };
 
     this.status = function(){
 
       helpers.logDebug('status: Start...');
 
-      if (argv.container === "" || argv.container === undefined) {
+      // List all containers
+      if (argv.name === "" || argv.name === undefined) {
         async.series([
             function(fn){ this._proxyStatus(fn); }.bind(this),
-            function(fn){ this._containers(fn); }.bind(this)
-        ]);
-      } else {
+            /*function(fn){ this._containers(fn); }.bind(this)*/
+        ],
+        function(err, results){
+          helpers.logDebug('status: results of async functions - ' + results);
+          helpers.logDebug('status: errors (if any) - ' + err);
+        });
+      } 
 
-        this._containerID = argv.container;
+      // Show status for a specific container
+      else {
+
+        this._containerID = null;
         this._name        = argv.name;
 
         async.series([
-            function(fn){ this._inspect(fn); }.bind(this),
+            function(fn){ this._proxyGetContainerIDForName(fn); }.bind(this),
+            function(fn){ 
+              this._isset(this._containerID, 'There is no app with the name: '+this._name);
+              this._inspect(fn); 
+            }.bind(this),
             function(fn){ this._logs(fn); }.bind(this),
             function(fn){ 
               console.log(prettyjson.render(this._settings));
@@ -756,6 +865,8 @@
     //-------------------------------------------------------------------------------------------------
     //
 
+    this._isset(argv.cmd, 'jacc requires a command, jacc.js --cmd push|status|help!');
+
     switch (argv.cmd) {
 
         case "push":
@@ -764,7 +875,7 @@
 
         case "help":
             console.log('--cmd push --name=www.example.com --port=8080: webapp.tar in the current directory will be deployed to the cloud');
-            console.log('--cmd status --container=XXX: show logs for container');
+            console.log('--cmd status --name=XXX: show logs for container');
             console.log('--help: show this message');
             break;
 
