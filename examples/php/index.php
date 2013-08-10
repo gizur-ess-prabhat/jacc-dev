@@ -2,4 +2,4 @@
  Print "Hello, World!";
 
 phpinfo();
-?>
+
