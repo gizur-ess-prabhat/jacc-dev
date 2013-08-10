@@ -4,10 +4,9 @@ doc:
 	cd webapp && php ./vendor/bin/sami.php update --force sami-config.php
 
 install:
-	cd webapp
-	curl -sS https://getcomposer.org/installer | php
-	mv composer.phar composer
-	./composer install
+	cd webapp && curl -sS https://getcomposer.org/installer | php
+	mv webapp/composer.phar webapp/composer
+	cd webapp && ./composer install
 
 clean:
 	cd webapp
