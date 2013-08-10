@@ -4,20 +4,20 @@ doc:
 	cd webapp && php ./vendor/bin/sami.php update --force sami-config.php
 
 install:
-	cd webapp && curl -sS https://getcomposer.org/installer | php
-	mv webapp/composer.phar webapp/composer
-	cd webapp && ./composer install
+	cd var/www && curl -sS https://getcomposer.org/installer | php
+	mv var/www/composer.phar var/www/composer
+	cd var/www && ./composer install
 
 clean:
-	cd webapp
+	cd var/www
 	rm -rf docs build cache
 
 test:
-	cd webapp
+	cd var/www
 	./vendor/bin/phpunit tests 
 
 lint:
-	cd webapp
+	cd var/www
 	./vendor/bin/phpcs --standard=Zend *.php
 
 push:
