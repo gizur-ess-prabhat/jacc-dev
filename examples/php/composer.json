@@ -1,0 +1,9 @@
+{
+    "require": {
+        "php": ">=5.3.0",
+        "EHER/PHPUnit": "*",
+        "guzzle/guzzle": "~3.2.0",
+        "instaclick/php-code-sniffer": "*",
+        "sami/sami": "dev-master"
+     }
+}
