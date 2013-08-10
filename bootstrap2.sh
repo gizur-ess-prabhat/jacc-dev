@@ -60,7 +60,7 @@ sudo apt-get install -y coffeescript
 # Install PHP
 #
 
-sudo apt-get install php5-cli -y
+sudo apt-get install php5-cli php5-curl -y
 
 #
 # Install hipache (reverse proxy developed by dotcloud)

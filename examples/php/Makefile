@@ -1,7 +1,6 @@
 all:
 
 doc:
-	phpdoc -t docs/api -d api/
 	php ./vendor/bin/sami.php update --force sami-config.php
 
 install:
