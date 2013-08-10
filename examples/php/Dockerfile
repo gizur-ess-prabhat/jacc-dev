@@ -32,14 +32,14 @@ RUN apt-get install -y git wget
 
 
 #
-# Install Python and virutalenv
+# Install Apache and PHP
 #
 
-RUN apt-get install -y apache php
+#RUN apt-get install -y apache php
 
 
 # -----------------------------------------------------------------------------------
-# Setup the app - NEEDS TO BE UPDATED
+# SETUP THE APP
 #
 
 # Bundle app source
