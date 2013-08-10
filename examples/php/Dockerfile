@@ -20,7 +20,7 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 RUN echo "127.0.0.1\t`hostname`" >> /etc/hosts
 
 # make sure the package repository is up to date
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
+#RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 RUN apt-get update -y
 
 
@@ -28,7 +28,7 @@ RUN apt-get update -y
 # Install some nice tools
 #
 
-RUN apt-get install -y git wget
+RUN apt-get install -y git wget curl
 
 
 #
