@@ -1,4 +1,4 @@
 Install with `make install`
 
-Build with `make build`
+Build and push to docker with `make push`
 
