@@ -55,6 +55,6 @@ RUN mv /var/www/composer.phar /var/www/composer
 RUN cd /var/www && ./composer install
 
 
-EXPOSE  80 443
+EXPOSE  8080 8443
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
