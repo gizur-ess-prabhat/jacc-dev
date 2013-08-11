@@ -51,4 +51,4 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
 
 # EXPOSE  80
-# CMD ["/usr/sbin/apache2ctl", "start"]
+CMD ["/usr/sbin/apache2ctl", "start"]
