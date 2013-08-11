@@ -21,5 +21,5 @@ lint:
 	./vendor/bin/phpcs --standard=Zend *.php
 
 push:
-	tar -cf webapp.tar *
+	rm webapp.tar && tar -cf webapp.tar *
 	jacc --cmd push --name=app1.jacc.local --port=8080
