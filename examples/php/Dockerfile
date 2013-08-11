@@ -46,12 +46,7 @@ RUN apt-get install apache2 php5 php5-curl -y
 #
 
 # Bundle everything and install in root
-ADD . /
-
-RUN chmod a+rx /var
-RUN chmod a+rx /var/www
-RUN chown -R www-data:www-data /var/www
-
+ADD ./src /var/www
 
 RUN cd /var/www && curl -sS https://getcomposer.org/installer | php
 RUN mv /var/www/composer.phar /var/www/composer
