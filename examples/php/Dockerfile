@@ -8,7 +8,7 @@
 #
 # VERSION               0.0.1
 
-FROM     creack/apache2
+FROM     creack/apache2:latest
 MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
 
@@ -51,4 +51,4 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
 
 # EXPOSE  80
-CMD ["/usr/sbin/apache2ctl", "start"]
+CMD ["/usr/sbin/apache2ctl"]
