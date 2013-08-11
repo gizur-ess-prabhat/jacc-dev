@@ -52,4 +52,4 @@ ADD . /
 
 EXPOSE  80
 EXPOSE  443
-CMD ["service", "apache2 start"]
+CMD ["/usr/sbin/apache2ctl", "start"]
