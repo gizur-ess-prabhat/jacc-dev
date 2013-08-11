@@ -32,6 +32,7 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 #
 
 #RUN apt-get install -y git wget curl lynx nano iputils-ping
+RUN apt-get install -y curl lynx
 
 
 #
