@@ -52,4 +52,4 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
 RUN /usr/sbin/apache2ctl start
 
-CMD ["tail", "-f /var/log/apache2/access.log"]
+CMD ["/usr/bin/tail", "-f", "/var/log/apache2/access.log"]
