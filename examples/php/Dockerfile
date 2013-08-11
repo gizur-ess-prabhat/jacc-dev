@@ -50,5 +50,5 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 # ADD . /
 
 
-# EXPOSE  80
-CMD ["/usr/sbin/apache2ctl"]
+EXPOSE  80
+CMD ["/usr/sbin/apache2ctl", "graceful"]
