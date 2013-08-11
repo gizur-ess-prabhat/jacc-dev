@@ -68,4 +68,27 @@ Vagrant.configure("2") do |config|
 #    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
 #  end
 
+
+  #
+  # A local virtualbox
+  #
+  # Using a bridged network instead of NAT (the VM will apear to be on the same network as the host)
+  #
+
+  config.vm.define :vb2 do |vb_config|
+    vb_config.vm.box = "raring64"
+    vb_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+
+    vb_config.vm.network :public_network
+    vb_config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: false
+    vb_config.vm.network :forwarded_port, guest: 49150, host: 49150, auto_correct: true
+    vb_config.vm.network :forwarded_port, guest: 49151, host: 49151, auto_correct: true
+    vb_config.vm.network :forwarded_port, guest: 49152, host: 49152, auto_correct: true
+    vb_config.vm.network :forwarded_port, guest: 49153, host: 49153, auto_correct: true
+    vb_config.vm.network :forwarded_port, guest: 49154, host: 49154, auto_correct: true
+    vb_config.vm.network :forwarded_port, guest: 49155, host: 49155, auto_correct: true
+
+    vb_config.vm.provision :shell, :path => "bootstrap2.sh"
+  end
+
 end
