@@ -31,7 +31,7 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 # Install some nice tools (mainly used for debugging)
 #
 
-RUN apt-get install -y git wget curl lynx nano iputils-ping
+# RUN apt-get install -y git wget curl lynx nano iputils-ping
 
 
 #
@@ -39,7 +39,7 @@ RUN apt-get install -y git wget curl lynx nano iputils-ping
 #
 
 #RUN apt-get install apache2 -y
-RUN apt-get install php5 -y
+# RUN apt-get install php5 -y
 
 
 # -----------------------------------------------------------------------------------
@@ -47,9 +47,8 @@ RUN apt-get install php5 -y
 #
 
 # Bundle everything and install in root
-ADD . /
+# ADD . /
 
 
-EXPOSE  80
-EXPOSE  443
-CMD ["/usr/sbin/apache2ctl", "start"]
+# EXPOSE  80
+# CMD ["/usr/sbin/apache2ctl", "start"]
