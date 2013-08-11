@@ -50,6 +50,5 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 # ADD . /
 
 
-RUN /usr/sbin/update-rc.d apache2 defaults
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
-CMD ["/usr/bin/tail", "-f", "/var/log/apache2/access.log"]
