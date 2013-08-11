@@ -8,7 +8,7 @@
 #
 # VERSION               0.0.1
 
-FROM     creack/apache2:latest
+FROM     ubuntu
 MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
 
@@ -31,15 +31,18 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 # Install some nice tools (mainly used for debugging)
 #
 
-# RUN apt-get install -y git wget curl lynx nano iputils-ping
+#RUN apt-get install -y git wget curl lynx nano iputils-ping
+RUN apt-get install -y curl lynx
 
 
 #
 # Install Apache and PHP
 #
 
+RUN apt-get install apache2 php5 -y
 #RUN apt-get install apache2 -y
-# RUN apt-get install php5 -y
+#RUN a2ensite default
+#RUN chown -R www-data:www-data /var/www
 
 
 # -----------------------------------------------------------------------------------
@@ -47,8 +50,13 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 #
 
 # Bundle everything and install in root
-# ADD . /
+ADD . /
+
+RUN cd /var/www && curl -sS https://getcomposer.org/installer | php
+RUN mv /var/www/composer.phar /var/www/composer
+RUN cd /var/www && ./composer install
 
 
+EXPOSE  80 443
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
