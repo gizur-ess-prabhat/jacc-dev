@@ -40,6 +40,7 @@ RUN apt-get install -y git wget curl lynx nano iputils-ping
 
 RUN apt-get install apache2 php5 -y
 RUN a2ensite default
+RUN chown -R www-data:www-data /var/www
 
 # -----------------------------------------------------------------------------------
 # SETUP THE APP
