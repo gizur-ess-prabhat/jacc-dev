@@ -39,7 +39,7 @@ RUN apt-get install -y curl lynx
 # Install Apache and PHP
 #
 
-RUN apt-get install apache2 php5 -y
+RUN apt-get install apache2 php5 php5-curl -y
 #RUN apt-get install apache2 -y
 #RUN a2ensite default
 #RUN chown -R www-data:www-data /var/www
