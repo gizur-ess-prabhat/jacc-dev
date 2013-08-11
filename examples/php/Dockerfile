@@ -51,4 +51,5 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 
 
 EXPOSE  80
-CMD ["/usr/sbin/apache2ctl", "graceful"]
+CMD ["/usr/sbin/apache2ctl", "start"]
+CMD ["tail", "-f /var/log/apache2/access.log"]
