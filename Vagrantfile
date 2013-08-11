@@ -76,8 +76,12 @@ Vagrant.configure("2") do |config|
   #
 
   config.vm.define :vb2 do |vb_config|
-    vb_config.vm.box = "raring64"
-    vb_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+#    vb_config.vm.box = "raring64"
+#    vb_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+
+    vb_config.vm.box = "raring64_2"
+    vb_config.vm.box_url = "https://www.dropbox.com/s/8my01y27c6eaabb/tswebtek-ubuntu-box-1304.box"
+
 
     vb_config.vm.network :public_network
     vb_config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: false
