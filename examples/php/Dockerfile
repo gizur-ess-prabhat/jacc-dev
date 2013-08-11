@@ -17,6 +17,7 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 #
 
 # sudo will complain about unknown host otherwise
+RUN echo "127.0.0.1\tlocalhost" >> /etc/hosts
 RUN echo "127.0.0.1\t`hostname`" >> /etc/hosts
 
 # make sure the package repository is up to date
@@ -27,10 +28,10 @@ RUN apt-get update -y
 
 
 #
-# Install some nice tools
+# Install some nice tools (mainly used for debugging)
 #
 
-RUN apt-get install -y git wget curl
+RUN apt-get install -y git wget curl lynx nano iputils-ping
 
 
 #
