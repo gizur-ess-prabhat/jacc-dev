@@ -31,7 +31,6 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 # Install some nice tools (mainly used for debugging)
 #
 
-#RUN apt-get install -y git wget curl lynx nano iputils-ping
 RUN apt-get install -y curl lynx git
 
 
@@ -40,9 +39,6 @@ RUN apt-get install -y curl lynx git
 #
 
 RUN apt-get install apache2 php5 php5-curl -y
-#RUN apt-get install apache2 -y
-#RUN a2ensite default
-#RUN chown -R www-data:www-data /var/www
 
 
 # -----------------------------------------------------------------------------------
@@ -51,6 +47,11 @@ RUN apt-get install apache2 php5 php5-curl -y
 
 # Bundle everything and install in root
 ADD . /
+
+RUN chmod a+rx /var
+RUN chmod a+rx /var/www
+RUN chown -R www-data:www-data /var/www
+
 
 RUN cd /var/www && curl -sS https://getcomposer.org/installer | php
 RUN mv /var/www/composer.phar /var/www/composer
