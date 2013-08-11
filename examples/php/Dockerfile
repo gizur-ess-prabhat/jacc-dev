@@ -50,6 +50,6 @@ MAINTAINER Jonas Colmsjö "jonas@gizur.com"
 # ADD . /
 
 
-RUN ["/usr/sbin/apache2ctl", "start"]
+RUN /usr/sbin/apache2ctl start
 
 CMD ["tail", "-f /var/log/apache2/access.log"]
