@@ -9,17 +9,15 @@ install:
 	cd var/www && ./composer install
 
 clean:
-	cd var/www
-	rm -rf docs build cache
+	cd var/www && rm -rf docs build cache
 
 test:
-	cd var/www
-	./vendor/bin/phpunit tests 
+	cd var/www && ./vendor/bin/phpunit tests 
 
 lint:
-	cd var/www
-	./vendor/bin/phpcs --standard=Zend *.php
+	cd var/www && ./vendor/bin/phpcs --standard=Zend *.php
 
 push:
-	rm webapp.tar && tar -cf webapp.tar *
+	if [ -e webapp.tar ]; then rm webapp.tar; fi
+	tar -cf webapp.tar *
 	jacc --cmd push --name=app1.jacc.local --port=8080
