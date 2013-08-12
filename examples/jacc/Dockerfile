@@ -41,6 +41,9 @@ RUN /usr/bin/ssh-keygen -t dsa -N "" -f /etc/ssh/ssh_host_dsa_key
 # Set the root password
 RUN echo "root:jacc" | chpasswd
 
+# Fix
+Add ./etc/pam.d /etc/pam.d
+
 EXPOSE 22
 
 # Start the ssh daemon
