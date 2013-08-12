@@ -27,7 +27,6 @@ RUN yum install -y git
 
 # Install hipache and redis (used by hipache)
 RUN npm install hipache -g
-RUN yum install -y redis-server
 
 
 # Install jacc
