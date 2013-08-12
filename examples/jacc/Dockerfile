@@ -33,7 +33,7 @@ RUN npm install hipache -g
 RUN npm install jacc -g
 
 # Install ssh daemon
-RUN apt-get install openssh-server -y
+RUN yum install openssh-server -y
 RUN mkdir /var/run/sshd
 
 
