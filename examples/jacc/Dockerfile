@@ -32,7 +32,13 @@ RUN npm install hipache -g
 # Install jacc
 RUN npm install jacc -g
 
+# Install ssh daemon
+RUN apt-get install openssh-server -y
+RUN mkdir /var/run/sshd
 
-# Start a shell that we can attach to
-CMD ["/bin/bash"]
+
+EXPOSE 22
+
+# Start the ssh daemon
+CMD ["/usr/sbin/sshd","-D"]
 
