@@ -22,7 +22,7 @@ RUN yum --enablerepo="epel" install -y npm ./nodejs-ansi-0.1.2-7.el6.1.noarch.rp
 
 
 # Install git
-yum install -y git
+RUN yum install -y git
 
 
 # Install hipache and redis (used by hipache)
