@@ -38,6 +38,9 @@ RUN mkdir /var/run/sshd
 RUN /usr/bin/ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_rsa_key
 RUN /usr/bin/ssh-keygen -t dsa -N "" -f /etc/ssh/ssh_host_dsa_key
 
+# Set the root password
+RUN echo "root:jacc" | chpasswd
+
 EXPOSE 22
 
 # Start the ssh daemon
