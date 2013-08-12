@@ -35,7 +35,7 @@ RUN npm install jacc -g
 # Install ssh daemon
 RUN yum install openssh-server -y
 RUN mkdir /var/run/sshd
-
+RUN /usr/bin/ssh-keygen -A
 
 EXPOSE 22
 
