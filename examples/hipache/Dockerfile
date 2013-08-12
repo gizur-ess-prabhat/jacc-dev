@@ -28,24 +28,10 @@ RUN yum install -y git
 # Install hipache and redis (used by hipache)
 RUN npm install hipache -g
 
+ADD ./hipache_config.json /etc
 
-# Install jacc
-RUN npm install jacc -g
+EXPOSE 8080
 
-# Install ssh daemon
-RUN yum install openssh-server -y
-RUN mkdir /var/run/sshd
-RUN /usr/bin/ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_rsa_key
-RUN /usr/bin/ssh-keygen -t dsa -N "" -f /etc/ssh/ssh_host_dsa_key
-
-# Set the root password
-RUN echo "root:jacc" | chpasswd
-
-# Fix
-Add ./etc/pam.d /etc/pam.d
-
-EXPOSE 22 8080
-
-# Start the ssh daemon
-CMD ["/usr/sbin/sshd","-D","-e","-f","/etc/ssh/sshd_config"]
+# Start hipache
+CMD ["/usr/bin/hipache","--config","/etc/hipache_config.json","2>&1"]
 
