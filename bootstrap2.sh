@@ -21,8 +21,11 @@ sudo apt-get install -y lxc-docker
 # Nifty tools
 #
 
-sudo apt-get install -y git unzip s3cmd curl
+sudo apt-get install -y git unzip s3cmd curl dkms
 
+# Init vbox guest additions
+# NOTE: Should avoid for AWS (need to figure out how)
+sudo /etc/init.d/vboxadd setup
 
 #
 # Install local docker registry
