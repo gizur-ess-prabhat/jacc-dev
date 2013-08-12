@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
   # AWS plugin
   #
 
-  config.vm.define :aws do |aws_config|
+  config.vm.define :ubuntu_aws do |aws_config|
    # aws_config.vm.forward_port 80, 8080
 
     aws_config.vm.provider :aws do |aws, override|
@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
   # Using a bridged network instead of NAT (the VM will apear to be on the same network as the host)
   #
 
-  config.vm.define :vb do |vb_config|
+  config.vm.define :ubuntu do |vb_config|
     vb_config.vm.box = "precise64"
     vb_config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
@@ -60,39 +60,17 @@ Vagrant.configure("2") do |config|
   end
 
 
- #
- # Had problems with the nameserver, this helped
- #
-
-#  config.vm.provider :virtualbox do |vb|
-#    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-#  end
-
-
   #
-  # A local virtualbox
-  #
-  # Using a bridged network instead of NAT (the VM will apear to be on the same network as the host)
+  # CoreOS - an operating system build for docker (only!)
   #
 
-  config.vm.define :vb2 do |vb_config|
-#    vb_config.vm.box = "raring64"
-#    vb_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+  config.vm.define :coreos do |vb_config|
 
-    vb_config.vm.box = "raring64_2"
-    vb_config.vm.box_url = "https://www.dropbox.com/s/8my01y27c6eaabb/tswebtek-ubuntu-box-1304.box"
-
-
-    vb_config.vm.network :public_network
+#    vb_config.vm.network :public_network
     vb_config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: false
-    vb_config.vm.network :forwarded_port, guest: 49150, host: 49150, auto_correct: true
-    vb_config.vm.network :forwarded_port, guest: 49151, host: 49151, auto_correct: true
-    vb_config.vm.network :forwarded_port, guest: 49152, host: 49152, auto_correct: true
-    vb_config.vm.network :forwarded_port, guest: 49153, host: 49153, auto_correct: true
-    vb_config.vm.network :forwarded_port, guest: 49154, host: 49154, auto_correct: true
-    vb_config.vm.network :forwarded_port, guest: 49155, host: 49155, auto_correct: true
 
-    vb_config.vm.provision :shell, :path => "bootstrap2.sh"
+    vb_config.vm.box = "coreos"
+    vb_config.vm.box_url = "http://storage.core-os.net/coreos/amd64-generic/dev-channel/coreos_production_vagrant.box"
   end
 
 end
