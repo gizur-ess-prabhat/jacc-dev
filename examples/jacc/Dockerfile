@@ -35,11 +35,11 @@ RUN npm install jacc -g
 # Install ssh daemon
 RUN yum install openssh-server -y
 RUN mkdir /var/run/sshd
-RUN /usr/bin/ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa
-RUN /usr/bin/ssh-keygen -t dsa -N "" -f /root/.ssh/id_dsa
+RUN /usr/bin/ssh-keygen -t rsa -N "" -f /etc/ssh/ssh_host_rsa_key
+RUN /usr/bin/ssh-keygen -t dsa -N "" -f /etc/ssh/ssh_host_dsa_key
 
 EXPOSE 22
 
 # Start the ssh daemon
-CMD ["/usr/sbin/sshd","-D"]
+CMD ["/usr/sbin/sshd","-D","-e","-f","/etc/ssh/sshd_config"]
 
