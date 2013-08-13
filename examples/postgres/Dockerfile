@@ -35,8 +35,8 @@ ADD ./etc/postgresql/9.1/main /etc/postgresql/9.1/main
 
 
 # Check status of the database
-RUN /etc/init.d/postgresql restart
-#RUN /etc/init.d/postgresql start
+#RUN /usr/sbin/service postgresql restart
+#RUN su postgreq -c "/etc/init.d/postgresql restart"
 
 
 # Create postgres user for OpenERP
@@ -55,4 +55,4 @@ RUN /etc/init.d/postgresql restart
 
 EXPOSE 5432
 
-CMD ["/usr/lib/postgresql/9.1/bin/postgres","-D","/var/lib/postgresql/9.1/main","-c","config_file=/etc/postgresql/9.1/main/postgresql.conf"]
+CMD ["su","postgres","-c","'/usr/lib/postgresql/9.1/bin/postgres -D /var/lib/postgresql/9.1/main -c config_file=/etc/postgresql/9.1/main/postgresql.conf'"]
