@@ -26,6 +26,9 @@ RUN apt-get update -y
 
 RUN apt-get install postgresql -y
 
+# STart the database
+RUN /etc/init.d/postgres start
+
 # Create postgres user for OpenERP
 RUN su postgres -c "createuser --createdb --username postgres --no-createrole -s openerp"
 
