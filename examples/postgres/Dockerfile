@@ -36,6 +36,12 @@ ADD ./etc/postgresql/9.1/main /etc/postgresql/9.1/main
 
 # Check status of the database
 RUN /bin/su postgres -c "/usr/sbin/service postgresql stop"
+
+# Hack, manual cleanup seams necessary
+RUN rm /var/lib/postgresql/9.1/main/postmaster.pid
+RUN rm /var/run/postgresql/*
+RUN rm /var/run/postgresql/.*
+
 #RUN su postgreq -c "/etc/init.d/postgresql restart"
 
 
