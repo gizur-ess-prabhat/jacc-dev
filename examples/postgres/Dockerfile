@@ -35,7 +35,7 @@ ADD ./etc/postgresql/9.1/main /etc/postgresql/9.1/main
 
 
 # Check status of the database
-#RUN /usr/sbin/service postgresql restart
+RUN /bin/su postgres -c "/usr/sbin/service postgresql stop"
 #RUN su postgreq -c "/etc/init.d/postgresql restart"
 
 
@@ -55,4 +55,4 @@ ADD ./etc/postgresql/9.1/main /etc/postgresql/9.1/main
 
 EXPOSE 5432
 
-CMD ["su","postgres","-c","'/usr/lib/postgresql/9.1/bin/postgres -D /var/lib/postgresql/9.1/main -c config_file=/etc/postgresql/9.1/main/postgresql.conf'"]
+CMD ["/bin/su","postgres","-c","/usr/lib/postgresql/9.1/bin/postgres -D /var/lib/postgresql/9.1/main -c config_file=/etc/postgresql/9.1/main/postgresql.conf"]
