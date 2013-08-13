@@ -26,25 +26,27 @@ RUN apt-get update -y
 
 RUN apt-get install postgresql -y
 
-# Check status of the database
-RUN /etc/init.d/postgresql status
-#RUN /etc/init.d/postgresql start
-
-
-# Create postgres user for OpenERP
-RUN su postgres -c "createuser --createdb --username postgres --no-createrole -s openerp"
-
-# Set password to 'postgres' for openerp user
-RUN su postgres -c "echo alter role openerp with password \'postgres\'\; |psql template1"
-
-# Show the users installed (just for debugging)
-RUN su postgres -c 'echo "SELECT rolname FROM pg_roles;\q"|psql'
 
 #
 # Add configuration changes
 #
 
 ADD ./etc/postgresql/9.1/main /etc/postgresql/9.1/main
+
+
+# Check status of the database
+RUN /etc/init.d/postgresql restart
+#RUN /etc/init.d/postgresql start
+
+
+# Create postgres user for OpenERP
+#RUN su postgres -c "createuser --createdb --username postgres --no-createrole -s openerp"
+
+# Set password to 'postgres' for openerp user
+#RUN su postgres -c "echo alter role openerp with password \'postgres\'\; |psql template1"
+
+# Show the users installed (just for debugging)
+#RUN su postgres -c 'echo "SELECT rolname FROM pg_roles;\q"|psql'
 
 
 #
