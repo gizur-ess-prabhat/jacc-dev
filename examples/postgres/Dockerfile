@@ -34,7 +34,7 @@ RUN apt-get install postgresql -y
 ADD ./etc/postgresql/9.1/main /etc/postgresql/9.1/main
 
 
-# Check status of the database
+# Stop the database
 RUN /bin/su postgres -c "/usr/sbin/service postgresql stop"
 
 # Hack, manual cleanup seams necessary
