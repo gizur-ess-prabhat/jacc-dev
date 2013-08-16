@@ -17,12 +17,14 @@ I've added this to the hosts file on my development laptop:
 127.0.0.1       app3.jacc.local
 ```
 
-Test that everything works by deploying the webapp in tests folder:
+After the installation, test that everything works by deploying the webapp in tests folder:
 
 ```
 cd tests
 ../jacc.js --cmd push --name=app1.jacc.local --port=8080
 ```
+
+Make sure that hipache is running, typically like this `sudo /usr/lib/node_modules/jacc/bin/start_hipache`
 
 
 Installation
@@ -47,6 +49,7 @@ used: `/usr/lib/node_modules/jacc/`
 
 
 If you already have docker, hipache and node installed then just do `sudo npm install --production -g`
+
 
 ## AWS EC2
 
@@ -75,6 +78,18 @@ export AWS_REGION=...
 
 vagrant up aws
 ```
+
+
+Tips and tricks
+--------------
+
+Capture the current IP adress (for interface eth0): `IP_ADDR=$(ifconfig|grep -a1 eth0|grep inet|cut -c 21-29)`
+
+Then define an alias: `alias docker='docker -H=tcp://$IP_ADDR'`
+
+Now you can run: `docker ps` instead of `docker -H=tcp://xxx.x.x.x ps`
+
+
 
 
 Troubleshooting
