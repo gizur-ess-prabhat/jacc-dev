@@ -44,4 +44,6 @@ RUN cd /src; mvn package
 
 
 EXPOSE  5000
-CMD ["java", "-cp","/src/target/classes:/src/target/dependency/*","-D PORT=5000", "HelloWorld"]
+CMD ["java", "-cp","/src/target/classes:/src/target/dependency/*","-DPORT=5000", "HelloWorld"]
+
+# Equivalent to doing this: java -cp /src/target/classes:/src/target/dependency/* -DPORT=5000 HelloWorld
