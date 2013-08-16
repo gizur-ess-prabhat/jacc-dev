@@ -43,7 +43,5 @@ ADD . /src
 RUN cd /src; mvn package
 
 
-RUN echo "PORT=5000" >> /etc/environment
 EXPOSE  5000
-
-CMD ["java", "-cp","/src/target/classes:/src/target/dependency/*","HelloWorld"]
+CMD ["java", "-cp","/src/target/classes:/src/target/dependency/*","-D PORT=5000", "HelloWorld"]
