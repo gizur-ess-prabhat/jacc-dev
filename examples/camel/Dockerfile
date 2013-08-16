@@ -18,7 +18,7 @@ RUN apt-get update -y
 # Install some nice tools
 #
 
-RUN apt-get install -y git wget
+RUN apt-get install -y git wget curl
 
 
 #
