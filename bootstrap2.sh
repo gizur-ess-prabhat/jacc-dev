@@ -26,6 +26,17 @@ sudo cp ./etc/bash.bashrc /etc
 
 
 #
+# Install golang and etcd
+#
+
+#DEBIAN_FRONTEND=noninteractive sudo apt-get install -y golang
+#curl -sS http://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz | tar xzv
+
+#git clone https://github.com/coreos/etcd
+#cd etcd && ./build
+
+
+#
 # Nifty tools
 #
 
@@ -34,19 +45,6 @@ sudo apt-get install -y git unzip s3cmd curl dkms
 # Init vbox guest additions
 # NOTE: Should avoid for AWS (need to figure out how)
 sudo /etc/init.d/vboxadd setup
-
-#
-# Install local docker registry
-#
-
-# Currently not used
-#echo DOCKER_INDEX_URL="http://0.0.0.0:5000/" >> ~/.profile
-
-#git clone https://github.com/dotcloud/docker-registry.git
-#cd docker-registry && cp config_sample.yml config.yml
-#pip install -r requirements.txt
-#./wsgi.py &
-#cd ..
 
 
 #
