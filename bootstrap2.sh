@@ -18,6 +18,12 @@ sudo apt-get install -y lxc-docker
 
 
 #
+#
+#
+
+RUN echo "function() ip_addr { echo `/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')` }" >> /etc/environment
+
+#
 # Nifty tools
 #
 
