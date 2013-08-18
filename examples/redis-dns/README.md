@@ -15,6 +15,15 @@ Install: `npm install --production`
 Test the setup
 --------------
 
+A good way of testing redis-dns is to run it within a docker container.
+
+```
+docker build .
+docker run -dns=[] CONTAINER_ID
+```
+
+Then start another terminal and start a new container: `docker run -t -i ubuntu /bin/bash`
+
 Start with setting up some hosts with their IP:s in redis (make sure redis is installed an running)
 
 ```
@@ -26,4 +35,4 @@ We can use `dig` for testing purposes. This does not require that we change the 
 are using for the tests since we can use an alternate port in dig.
 
 
-`dig @localhost -p 5353 redis-dns.local A`
+`dig @IP_OF_DNS_CONTAINER -p 5353 redis-dns.local A`
