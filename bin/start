@@ -1,0 +1,7 @@
+#!/bin/bash
+ABSOLUTE_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+
+#hipache --config $ABSOLUTE_PATH/../hipache_config.json > $ABSOLUTE_PATH/../var/log/hipache.log 2>&1 &
+$ABSOLUTE_PATH/../node_modules/.bin/hipache --config $ABSOLUTE_PATH/../hipache_config.json > /var/log/hipache.log 2>&1 &
+
+$ABSOLUTE_PATH/../node_modules/.bin/redis-dns --config $ABSOLUTE_PATH/../hipache_config.json > /var/log/hipache.log 2>&1 &

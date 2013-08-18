@@ -35,26 +35,6 @@ sudo apt-get install -y git unzip s3cmd curl dkms
 # NOTE: Should avoid for AWS (need to figure out how)
 sudo /etc/init.d/vboxadd setup
 
-#
-# Install golang and etcd
-#
-
-#DEBIAN_FRONTEND=noninteractive sudo apt-get install -y golang
-#cd /usr/local && curl -sS http://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz | tar xzv
-
-#sudo echo "export GOROOT=/usr/local/go" >> /etc/bash.bashrc
-#sudo echo "export PATH=$PATH:$GOROOT/bin" >> /etc/bash.bashrc
-
-#sudo echo "export GOROOT=/usr/local/go" >> /root/.bashrc
-#sudo echo "export PATH=$PATH:$GOROOT/bin" >> /root/.bashrc
-
-#sudo echo "export GOROOT=/usr/local/go" >> /root/.profile
-#sudo echo "export PATH=$PATH:$GOROOT/bin" >> /root/.profile
-
-
-#cd /usr/local && git clone https://github.com/coreos/etcd
-#cd /usr/local/etcd && ./build
-
 
 
 #
@@ -81,19 +61,6 @@ sudo apt-get install -y coffeescript
 
 sudo apt-get install php5-cli php5-curl -y
 
-#
-# Install hipache (reverse proxy developed by dotcloud)
-#
-
-sudo npm install hipache -g
-
-
-#
-# Install redis-dns
-#
-
-sudo npm install redis-dns -g
-
 
 #
 # Install grunt, used for nodejs development
@@ -101,12 +68,6 @@ sudo npm install redis-dns -g
 
 sudo npm install grunt grunt-cli -g
 
-
-#
-# Local name server, used for development and testing purposes
-#
-
-sudo npm install -g appload-dns
 
 # Use the local nameserver and then google's
 sudo sh -c 'echo "dns-nameservers localhost 8.8.8.8" >> /etc/network/interfaces'
