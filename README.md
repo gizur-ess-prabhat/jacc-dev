@@ -117,3 +117,7 @@ git clone https://github.com/colmsjo/jacc.git
 cd jacc && sudo npm install --production -g
 ```
 
+
+Q: Problems with the DNS within containers
+
+A: Add this `/usr/bin/docker -d -dns 8.8.8.8` to /etc/init/docker.conf
