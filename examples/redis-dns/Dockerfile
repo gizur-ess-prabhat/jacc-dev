@@ -22,7 +22,7 @@ RUN yum --enablerepo="epel" install -y npm ./nodejs-ansi-0.1.2-7.el6.1.noarch.rp
 ADD . /src
 
 # Install app dependencies
-RUN cd /src; npm install
+RUN cd /src; npm install --production
 
 EXPOSE  5353
 CMD ["node", "/src/server.js"]

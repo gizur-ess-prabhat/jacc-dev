@@ -19,10 +19,12 @@ A good way of testing redis-dns is to run it within a docker container.
 
 ```
 docker build .
-docker run -dns=[] CONTAINER_ID
+...
+Successfully built 0e58a485fe88
+docker run 0e58a485fe88
 ```
 
-Then start another terminal and start a new container: `docker run -t -i ubuntu /bin/bash`
+Then start another terminal and start a new container: `docker run -t -i -dns=[] CONTAINER_ID ubuntu /bin/bash`
 
 Start with setting up some hosts with their IP:s in redis (make sure redis is installed an running)
 
