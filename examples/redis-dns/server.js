@@ -66,7 +66,7 @@ function handler(req, res) {
         if(redis_err) {
           helpers.logErr('Redis error:'+redis_err);
         } else {
-          if(redis_res.length > 0) {
+          if(redis_res !== null && redis_res.length > 0) {
             answer = {
               name:hostname, 
               type:'A', 
