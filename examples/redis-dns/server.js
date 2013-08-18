@@ -61,11 +61,10 @@ function handler(req, res) {
 
       // first set the IP for the domain in redis
       redis_client.get("redis-dns:"+hostname, function(redis_err, redis_res) {
-        redis_client.quit();
-
         if(redis_err) {
           helpers.logErr('Redis error:'+redis_err);
         } else {
+          helpers.logDebug('redis result: '+redis_res);
           if(redis_res !== null && redis_res.length > 0) {
             answer = {
               name:hostname, 
@@ -76,6 +75,7 @@ function handler(req, res) {
             res.answer.push(answer);
           }
         }
+        redis_client.quit();
       }.bind(this));
     }.bind(this));
 
