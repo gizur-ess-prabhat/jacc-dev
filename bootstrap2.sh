@@ -26,17 +26,6 @@ sudo cp ./etc/bash.bashrc /etc
 
 
 #
-# Install golang and etcd
-#
-
-#DEBIAN_FRONTEND=noninteractive sudo apt-get install -y golang
-#curl -sS http://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz | tar xzv
-
-#git clone https://github.com/coreos/etcd
-#cd etcd && ./build
-
-
-#
 # Nifty tools
 #
 
@@ -45,6 +34,27 @@ sudo apt-get install -y git unzip s3cmd curl dkms
 # Init vbox guest additions
 # NOTE: Should avoid for AWS (need to figure out how)
 sudo /etc/init.d/vboxadd setup
+
+#
+# Install golang and etcd
+#
+
+#DEBIAN_FRONTEND=noninteractive sudo apt-get install -y golang
+#cd /usr/local && curl -sS http://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz | tar xzv
+
+#sudo echo "export GOROOT=/usr/local/go" >> /etc/bash.bashrc
+#sudo echo "export PATH=$PATH:$GOROOT/bin" >> /etc/bash.bashrc
+
+#sudo echo "export GOROOT=/usr/local/go" >> /root/.bashrc
+#sudo echo "export PATH=$PATH:$GOROOT/bin" >> /root/.bashrc
+
+#sudo echo "export GOROOT=/usr/local/go" >> /root/.profile
+#sudo echo "export PATH=$PATH:$GOROOT/bin" >> /root/.profile
+
+
+#cd /usr/local && git clone https://github.com/coreos/etcd
+#cd /usr/local/etcd && ./build
+
 
 
 #
