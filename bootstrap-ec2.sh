@@ -12,7 +12,6 @@ sudo apt-get install linux-image-extra-`uname -r`
 # Upgrade the kernel
 #
 
-#sudo apt-get install -y linux-image-generic-lts-raring
 sudo apt-get upgrade -y
 sudo reboot
 

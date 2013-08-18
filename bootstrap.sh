@@ -7,11 +7,9 @@
 
 sudo apt-get update
 
+
 #
 # Kernel upgrade
 #
 
 sudo apt-get install -y linux-image-generic-lts-raring
-#sudo reboot
-#echo "Sleep for 10 seconds while rebooting..."
-#sleep 10
