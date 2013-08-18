@@ -1,11 +1,12 @@
 /*jshint -W054, evil:true, devel:true, browser:true*/
 
 //
-// Unit tests for the helper functions that are executed from node
+// Unit tests 
 //
 // Run like this:
-// >nodeunit helpers_test.js
+// >nodeunit test_redis-dns.js
 //
+// NOTE: THIS TESTS HAVE NOT BEEN COMPLETED, TESTING FROM COMMAND LINE WITH DIG
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -26,6 +27,7 @@
     test.doesNotThrow(block, [error], [message])
     test.ifError(value)
 */
+
 
 // Unit test
 //-------------------------------------------------------------------------------------------------

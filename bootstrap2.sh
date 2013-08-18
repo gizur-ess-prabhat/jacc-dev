@@ -89,6 +89,13 @@ sudo npm install hipache -g
 
 
 #
+# Install redis-dns
+#
+
+sudo npm install redis-dns -g
+
+
+#
 # Install grunt, used for nodejs development
 #
 

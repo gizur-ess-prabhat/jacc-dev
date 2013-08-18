@@ -7,7 +7,7 @@ Pre-requisite:
  * NodeJs
  * Redis server
 
-Make sure that you are using this DNS server on the clients you want to use this DNS. Check /etc/resolv.conf if you're running on unix. In windows, check the network settings in the control panel.
+Make sure to setup DNS correctly on the hosts where you want to use this DNS server. Check /etc/resolv.conf if you're running on unix. In windows, check the network settings in the control panel.
 
 Install: `npm install --production`
 
@@ -28,7 +28,12 @@ redis-cli set redis-dns:appserver.redis-dns.local 10.0.0.2
 We can use `dig` for testing purposes. This does not require that we change the DNS of the machine we
 are using for the tests since we can use an alternate port in dig.
 
-Run: `dig @localhost -p 5353 dbserver.redis-dns.local A`
+Should give 10.0.0.1: `dig @localhost -p 5353 dbserver.redis-dns.local A`
+
+Should give empty answer: `dig @localhost -p 5353 dbserverrrr.redis-dns.local A`
+
+Should give empty answer: `dig @localhost -p 5353 dbserver.redis-dns.local MX`
+
 
 
 
