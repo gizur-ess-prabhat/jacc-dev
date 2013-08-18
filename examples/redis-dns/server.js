@@ -64,7 +64,6 @@ function handler(req, res) {
         if(redis_err) {
           helpers.logErr('Redis error:'+redis_err);
         } else {
-          helpers.logDebug('redis result: '+redis_res);
           if(redis_res !== null && redis_res.length > 0) {
             answer = {
               name:hostname, 
@@ -89,9 +88,6 @@ function handler(req, res) {
   }
 
 }
-
-helpers.logging_threshold  = helpers.logging.debug;
-//helpers.logging_threshold  = helpers.logging.warning;
 
 var server = dnsd.createServer(handler);
 console.log('Server running at'+this.dnsInterface+':'+this.dnsPort);
