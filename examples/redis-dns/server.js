@@ -12,8 +12,8 @@
 //------------------------------
 
 var dnsd       = require('dnsd'),
-  helpers    = require('helpersjs').create(),
-  nconf      = require('nconf');
+    helpers    = require('helpersjs').create(),
+    nconf      = require('nconf');
 
 
   nconf.use('file', { file: __dirname + '/redis-dns-config.json' });
@@ -96,6 +96,6 @@ helpers.logging_threshold  = helpers.logging.debug;
 //helpers.logging_threshold  = helpers.logging.warning;
 
 var server = dnsd.createServer(handler);
-console.log('Server running at 127.0.0.1:'+this.dnsPort);
+console.log('Server running at'+this.dnsInterface+':'+this.dnsPort);
 server.zone(this.dnsZone, 'ns1.'+this.dnsZone, 'us@'+this.dnsZone, 'now', '2h', '30m', '2w', '10m')
       .listen(this.dnsPort, this.dnsInterface);
