@@ -76,6 +76,8 @@ function handler(req, res) {
           }
         }
         redis_client.quit();
+        console.log('%s:%s/%s question:%j answer:%j', req.connection.remoteAddress, req.connection.remotePort, req.connection.type, question, answer);
+        res.end();
       }.bind(this));
     }.bind(this));
 
@@ -84,12 +86,8 @@ function handler(req, res) {
       console.log("Redis error: " + err);
     });
 
-
   }
 
-  console.log('%s:%s/%s question:%j answer:%j', req.connection.remoteAddress, req.connection.remotePort, req.connection.type, question, answer);
-
-  res.end();
 }
 
 helpers.logging_threshold  = helpers.logging.debug;
