@@ -85,6 +85,8 @@ function handler(req, res) {
       console.log("Redis error: " + err);
     });
 
+  } else {
+    res.end();
   }
 
 }
