@@ -1,6 +1,6 @@
 {
     "server": {
-        "accessLog": "/var/log/hipache_access.log",
+        "accessLog": "../var/log/hipache_access.log",
         "port": 8080,
         "workers": 5,
         "maxSockets": 100,
