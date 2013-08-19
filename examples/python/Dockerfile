@@ -1,10 +1,4 @@
-#
-# Dockerfile that builds container with nodejs and Python
-# When not using vagrant, run it manually with: docker build - < Dockerfile.nodejs
-#
-
-
-# Image: NodeJS & Python
+# Image: Python
 #
 # VERSION               0.0.1
 
@@ -40,21 +34,23 @@ RUN easy_install pip
 RUN pip install virtualenv
 
 # Install some dependensices (the OpenERP list)
-RUN apt-get install -y python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-reportlab python-simplejson python-tz python-vobject python-werkzeug python-yaml
-
-RUN echo "Create a python env: virtualenv venv --distribute"
-RUN echo "Then run: source venv/bin/activate"
+#RUN apt-get install -y python-dateutil python-feedparser python-ldap python-libxslt1 python-lxml python-mako python-openid python-psycopg2 python-reportlab python-simplejson python-tz python-vobject python-werkzeug python-yaml
+#RUN apt-get install -y libldap2-dev libsasl2-dev libpq-dev libxml2-dev libxslt1-dev
 
 
-# -----------------------------------------------------------------------------------
-# Setup the app - NEEDS TO BE UPDATED
-#
+# Create Python environment
+RUN /usr/local/bin/virtualenv /venv --distribute
 
 # Bundle app source
-ADD . /src
+ADD . /venv/src
 
-# Install app dependencies
-RUN cd /src; npm install
+# Install OpenERP
+RUN cd /venv/src
 
-EXPOSE  8080
-CMD ["node", "/src/index.js"]
+
+# Create a user to run as, root is not allowed
+#RUN useradd -r -m -s /bin/bash openerp
+
+EXPOSE  5000
+#CMD ["/bin/su", "openerp", "-c", "source /venv/bin/activate; /venv/bin/openerp-server"]
+CMD ["source /venv/bin/activate; /venv/bin/python","/venv/src/app.py"]
