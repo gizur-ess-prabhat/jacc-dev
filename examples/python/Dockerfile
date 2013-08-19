@@ -49,8 +49,9 @@ RUN /bin/bash -c "source /venv/bin/activate; cd /venv/src; pip install -r requir
 
 
 # Create a user to run as, root is not allowed
-#RUN useradd -r -m -s /bin/bash openerp
+RUN useradd -r -m -s /bin/bash python-user
 
 EXPOSE  5000
 #CMD ["/bin/su", "openerp", "-c", "source /venv/bin/activate; /venv/bin/openerp-server"]
-CMD ["bin/bash","-c source /venv/bin/activate; /venv/bin/python /venv/src/app.py"]
+#CMD ["bin/bash","-c source /venv/bin/activate; /venv/bin/python /venv/src/app.py"]
+CMD ["/bin/su", "python-user", "-c", "source /venv/bin/activate; /venv/bin/python /venv/src/app.py"]
