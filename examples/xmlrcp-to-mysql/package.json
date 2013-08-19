@@ -1,0 +1,11 @@
+{
+  "name": "xmlrpc-to-mysql",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Replicate XMLRPC API to MySQL",
+  "author": "Jonas Colmsjö <jonas@gizur.com>",
+  "dependencies": {
+    "xmlrpc": "1.1.0",
+    "mysql" : "2.0.0-alpha8"
+  }
+}
