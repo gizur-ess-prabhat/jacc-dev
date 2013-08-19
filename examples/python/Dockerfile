@@ -45,7 +45,7 @@ RUN /usr/local/bin/virtualenv /venv --distribute
 ADD . /venv/src
 
 # Install OpenERP
-RUN cd /venv/src
+RUN source /venv/bin/activate; cd /venv/src; pip install -r requirements.txt 
 
 
 # Create a user to run as, root is not allowed
