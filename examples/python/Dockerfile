@@ -53,4 +53,4 @@ RUN /bin/bash -c "source /venv/bin/activate; cd /venv/src; pip install -r requir
 
 EXPOSE  5000
 #CMD ["/bin/su", "openerp", "-c", "source /venv/bin/activate; /venv/bin/openerp-server"]
-CMD ["source /venv/bin/activate; /venv/bin/python","/venv/src/app.py"]
+CMD ["bin/bash","-c source /venv/bin/activate; /venv/bin/python /venv/src/app.py"]
