@@ -5,4 +5,4 @@ select * from user where User='root' and Host='%';
 
 
 /* Set the password for the root user, CAHNGE THIS */
-/* SET PASSWORD FOR root = PASSWORD('my_root_password'); */
+SET PASSWORD FOR root = PASSWORD('my_root_password');
