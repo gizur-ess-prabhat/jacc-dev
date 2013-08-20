@@ -14,6 +14,8 @@ RUN yum install -y mysql-server
 
 RUN /usr/bin/mysql_install_db
 
+RUN /usr/sbin/mysqld_safe &
+
 # Bundle app source
 ADD . /src
 
@@ -21,4 +23,5 @@ ADD . /src
 EXPOSE  3306
 #CMD ["/usr/sbin/mysqld_safe","--no-defaults"]
 #CMD ["/usr/libexec/mysqld","--basedir=/usr","--datadir=/var/lib/mysql","--user=mysql","--log-error=/var/log/mysqld.log","--pid-file=/var/run/mysqld/mysqld.pid", "--socket=/var/lib/mysql/mysql.sock"]
-CMD ["/usr/libexec/mysqld","--basedir=/usr","--datadir=/var/lib/mysql","--user=mysql","--pid-file=/var/run/mysqld/mysqld.pid", "--socket=/var/lib/mysql/mysql.sock"]
+#CMD ["/usr/libexec/mysqld","--basedir=/usr","--datadir=/var/lib/mysql","--user=mysql","--pid-file=/var/run/mysqld/mysqld.pid", "--socket=/var/lib/mysql/mysql.sock"]
+CMD ["/usr/bin/tail","-f /var/log/mysqld.log"]
