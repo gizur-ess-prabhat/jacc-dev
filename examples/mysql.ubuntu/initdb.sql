@@ -1,5 +1,7 @@
 /* Allow the root user to login from any host */
 
+use mysql;
+
 update user set Host='%' where User='root' and Host='localhost';
 select * from user where User='root' and Host='%';
 
