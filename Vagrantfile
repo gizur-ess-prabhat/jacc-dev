@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
     vb_config.vm.box = "precise64"
     vb_config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
-    vb_config.vm.network :public_network
+#    vb_config.vm.network :public_network
     vb_config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct: true
     vb_config.vm.network :forwarded_port, guest: 49150, host: 49150, auto_correct: true
     vb_config.vm.network :forwarded_port, guest: 49151, host: 49151, auto_correct: true
