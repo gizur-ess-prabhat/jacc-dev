@@ -17,6 +17,15 @@ RUN /usr/bin/mysql_install_db
 # Bundle app source
 ADD . /src
 
+
+#You can start the MySQL daemon with:
+RUN cd /usr ; /usr/bin/mysqld_safe &
+
+You can test the MySQL daemon with mysql-test-run.pl
+RUN cd /usr/mysql-test ; perl mysql-test-run.pl
+
+
 EXPOSE  3306
-CMD ["/usr/sbin/mysqld_safe","--no-defaults"]
+#CMD ["/usr/sbin/mysqld_safe","--no-defaults"]
+CMD ["/bin/bash"]
 
