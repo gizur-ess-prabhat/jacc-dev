@@ -14,7 +14,7 @@ RUN /usr/bin/mysql_install_db
 # Bundle app source
 ADD . /src
 
-ADD ./etc /etc
+ADD ./etc/mysql /etc/mysql
 
 EXPOSE  3306
 CMD ["/src/start.sh"]
