@@ -1,10 +1,4 @@
-#
-# Dockerfile that builds container with nodejs and Python
-# When not using vagrant, run it manually with: docker build - < Dockerfile.nodejs
-#
-
-
-# Image: NodeJs / hipache / jacc
+# Image: hipache 
 #
 # VERSION               0.0.1
 

@@ -21,8 +21,12 @@ RUN wget http://kojipkgs.fedoraproject.org//packages/nodejs-ansi/0.1.2/7.el6.1/n
 RUN yum --enablerepo="epel" install -y npm ./nodejs-ansi-0.1.2-7.el6.1.noarch.rpm
 
 
-# Install git
-RUN yum install -y git
+# Install some tolls
+RUN yum install -y git nano
+
+
+# Install redis
+RUN yum install redis -y
 
 
 # Install hipache and redis (used by hipache)
@@ -43,6 +47,11 @@ RUN echo "root:jacc" | chpasswd
 
 # Fix
 Add ./etc/pam.d /etc/pam.d
+
+
+# Add container definitions that are useful in coreos
+ADD ./root /root
+
 
 EXPOSE 22 8080
 

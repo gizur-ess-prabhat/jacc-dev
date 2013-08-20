@@ -50,6 +50,9 @@ used: `/usr/lib/node_modules/jacc/`
 
 If you already have docker, hipache and node installed then just do `sudo npm install --production -g`
 
+Starting in version 0.5.2, docker needs the flag `-H 127.0.0.1` to enable the remote API.
+In ubuntu, this is entered in /etc/init/docker.conf.
+
 
 ## AWS EC2
 
