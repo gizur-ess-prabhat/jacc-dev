@@ -7,7 +7,7 @@
 FROM    ubuntu
 
 # Install MySQL server, used for development
-RUN apt-get install -y mysql-server
+RUN DEBIAN_FRONTEND=noninteractive=apt-get install -y mysql-server
 
 RUN /usr/bin/mysql_install_db
 
