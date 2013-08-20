@@ -1,0 +1,18 @@
+# Image: MySQL
+#
+# VERSION               0.0.1
+
+
+# DOCKER-VERSION 0.3.4
+FROM    ubuntu
+
+# Install MySQL server, used for development
+RUN apt-get install -y mysql-server
+
+RUN /usr/bin/mysql_install_db
+
+# Bundle app source
+ADD . /src
+
+EXPOSE  3306
+CMD ["/src/start.sh"]
