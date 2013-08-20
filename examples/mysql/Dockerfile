@@ -20,4 +20,5 @@ ADD . /src
 
 EXPOSE  3306
 #CMD ["/usr/sbin/mysqld_safe","--no-defaults"]
-CMD ["/usr/libexec/mysqld","--basedir=/usr","--datadir=/var/lib/mysql","--user=mysql","--log-error=/var/log/mysqld.log","--pid-file=/var/run/mysqld/mysqld.pid", "--socket=/var/lib/mysql/mysql.sock"]
+#CMD ["/usr/libexec/mysqld","--basedir=/usr","--datadir=/var/lib/mysql","--user=mysql","--log-error=/var/log/mysqld.log","--pid-file=/var/run/mysqld/mysqld.pid", "--socket=/var/lib/mysql/mysql.sock"]
+CMD ["/usr/libexec/mysqld","--basedir=/usr","--datadir=/var/lib/mysql","--user=mysql","--pid-file=/var/run/mysqld/mysqld.pid", "--socket=/var/lib/mysql/mysql.sock"]
