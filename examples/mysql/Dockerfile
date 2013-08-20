@@ -12,9 +12,11 @@ FROM    centos:6.4
 # Install MySQL server, used for development
 RUN yum install -y mysql-server
 
+RUN /usr/bin/mysql_install_db
+
 # Bundle app source
 ADD . /src
 
 EXPOSE  3306
-CMD ["/usr/sbin/mysqld_safe"]
+CMD ["/usr/sbin/mysqld_safe","--no-defaults"]
 
