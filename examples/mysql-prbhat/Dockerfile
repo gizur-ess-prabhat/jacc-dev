@@ -12,6 +12,11 @@ RUN ln -s /bin/true /sbin/initctl
 
 RUN apt-get update
 
+
+# Bundle everything
+ADD . /src
+
+
 # Install MySQL server
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -25,10 +30,8 @@ RUN /usr/sbin/mysqld &
 RUN sleep 5
 RUN echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'mysql-server' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
 
-
-#ADD ./mysql-setup.sh /tmp/mysql-setup.sh
 #RUN /bin/sh /tmp/mysql-setup.sh
 
-EXPOSE 3306
 
-CMD ["/usr/sbin/mysqld"]
+EXPOSE 3306
+CMD ["/src/start.sh"]
