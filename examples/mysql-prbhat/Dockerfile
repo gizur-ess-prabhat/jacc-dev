@@ -26,11 +26,11 @@ RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysq
 # Grant priviledges to admin user
 # Username: admin
 # Password: mysql-server
-RUN /usr/sbin/mysqld &
-RUN sleep 5
-RUN echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'mysql-server' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
+#RUN /usr/sbin/mysqld &
+#RUN sleep 5
+#RUN echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'mysql-server' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
 
-#RUN /bin/sh /tmp/mysql-setup.sh
+RUN /src/mysql-setup.sh
 
 
 EXPOSE 3306
