@@ -1,21 +1,37 @@
-# Image: MySQL
+# MySQL Server
 #
 # VERSION               0.0.1
 
+FROM     base
+MAINTAINER Prabhat Khera "prabhat.khera@gmail.com"
 
-# DOCKER-VERSION 0.3.4
-FROM    centos:6.4
 
-# Enable EPEL
-#RUN     rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+# Keep upstart from complaining
+RUN dpkg-divert --local --rename --add /sbin/initctl
+RUN ln -s /bin/true /sbin/initctl
 
-# Install MySQL server, used for development
-RUN yum install -y mysql-server
+RUN apt-get update
 
-RUN /usr/bin/mysql_install_db
 
-# Bundle app source
+# Bundle everything
 ADD . /src
 
-EXPOSE  3306
+
+# Install MySQL server
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Fix configuration
+RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf
+
+# Grant priviledges to admin user
+# Username: admin
+# Password: mysql-server
+#RUN /usr/sbin/mysqld &
+#RUN sleep 5
+#RUN echo "GRANT ALL ON *.* TO admin@'%' IDENTIFIED BY 'mysql-server' WITH GRANT OPTION; FLUSH PRIVILEGES" | mysql
+
+RUN /src/mysql-setup.sh
+
+
+EXPOSE 3306
 CMD ["/src/start.sh"]
