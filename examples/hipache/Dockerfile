@@ -22,10 +22,10 @@ RUN yum install -y git
 # Install hipache and redis (used by hipache)
 RUN npm install hipache -g
 
-ADD ./hipache_config.json /etc
+ADD ./hipache_config.json ~/
 
 EXPOSE 8080
 
 # Start hipache
-CMD ["/usr/bin/hipache","--config","/etc/hipache_config.json","2>&1"]
+CMD ["/usr/bin/hipache","--config","~/hipache_config.json","2>&1"]
 
