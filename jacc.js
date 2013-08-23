@@ -39,14 +39,21 @@
     // ================
 
     var hostname,
-        port;
+        port,
+        redisHostname,
+        redisPort,
+        redisOptions;
 
-    nconf.use('file', { file: __dirname + '/jacc_config.json' });
+    nconf.use('file', {file: './conf/jacc_config.json'});
     nconf.load();
 
     this.hostname = nconf.get('hostname');
     this.port     = nconf.get('port');
 
+    this.redisHostname = nconf.get('redisHostname');
+    this.redisPort = nconf.get('redisPort');
+    this.redisOptions = nconf.get('redisOptions');
+    
     // set logging level
     switch(nconf.get('logging')) {
 
@@ -71,6 +78,7 @@
     var  _imageID      = "",
         _containerID   = "",
         _name          = "",
+        _internalName = "",
         _containerPort,
         _use_export    = false,
         _settings      = {};
@@ -112,7 +120,7 @@
 
       this._isset(this._name, '_proxyGetContainerIDForName: this._name not set');
 
-      var redis_client = redis.createClient();
+      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
 
       redis_client.on("connect", function () {
 
@@ -151,7 +159,7 @@
 
       this._isset(this._name, '_deleteProxy: this._name not set');
 
-      var redis_client = redis.createClient();
+      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
 
       redis_client.on("connect", function () {
 
@@ -186,7 +194,7 @@
 
       helpers.logDebug('updateProxy: Start...');
 
-      var redis_client = redis.createClient();
+      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
 
       redis_client.on("connect", function () {
           redis_client.rpush("frontend:"+this._name, this._containerID, 
@@ -209,6 +217,16 @@
 
                               });
 
+          /**
+           * Add entry for redis-dns
+           */
+          redis_client.set('redis-dns:' + this._internalName, this._settings.NetworkSettings.IPAddress, function(err, res) {
+              if (err) {
+                  helpers.logErr('ERROR! updateProxy failed when writing to Redis DNS');
+              }
+              helpers.logDebug('_updateProxy: wrote frontend (dns) - ' + res);
+          }); 
+            
           redis_client.quit();
 
           helpers.logDebug('updateProxy: backend - ' + backend);
@@ -238,7 +256,7 @@
 
       helpers.logDebug('_proxyStatus: Start...');
 
-      var redis_client = redis.createClient();
+      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
 
       redis_client.on("connect", function () {
 
@@ -754,6 +772,7 @@
         this._isset(argv.port, 'push requires the container port to be set - for instance --port=8080!');
 
         this._name          = argv.name;
+        this._internalName  = argv.internalName;
         this._containerPort = argv.port;
         this._use_export    = argv.use_export;
 
