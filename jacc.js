@@ -83,6 +83,7 @@
         _internalName = "",
         _containerPort,
         _use_export    = false,
+        _dns = null,
         _settings      = {};
 
 
@@ -497,7 +498,7 @@
          "OpenStdin":false,
          "StdinOnce":false,
          "Env":null,
-         "Dns":null,
+         "Dns":this._dns,
          "Image":this._imageID,
          "Volumes":{},
          "VolumesFrom":""
@@ -777,6 +778,7 @@
         this._internalName  = argv.internalName;
         this._containerPort = argv.port;
         this._use_export    = argv.use_export;
+        this._dns   = argv.dns;
 
         async.series([
             // Delete the container and image if it already exists
