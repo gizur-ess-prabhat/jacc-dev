@@ -1,0 +1,10 @@
+{
+  "hostname" : "localhost",
+  "port" : 4243,
+  "logging" : "warning",
+  "redisHostname" : "172.17.42.1",
+  "redisPort" : 6379,
+  "redisOptions" : {
+      "no_ready_check" : true
+  }
+}
