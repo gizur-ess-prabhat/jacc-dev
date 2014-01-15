@@ -47,6 +47,8 @@
     nconf.use('file', {file: './conf/jacc_config.json'});
     nconf.load();
 
+    var that = this;
+    
     this.hostname = nconf.get('hostname');
     this.port     = nconf.get('port');
 
@@ -120,7 +122,7 @@
 
       this._isset(this._name, '_proxyGetContainerIDForName: this._name not set');
 
-      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
+      var redis_client = redis.createClient(that.redisPort, that.redisHostname, that.redisOptions);
 
       redis_client.on("connect", function () {
 
@@ -159,7 +161,7 @@
 
       this._isset(this._name, '_deleteProxy: this._name not set');
 
-      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
+      var redis_client = redis.createClient(that.redisPort, that.redisHostname, that.redisOptions);
 
       redis_client.on("connect", function () {
 
@@ -194,7 +196,7 @@
 
       helpers.logDebug('updateProxy: Start...');
 
-      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
+      var redis_client = redis.createClient(that.redisPort, that.redisHostname, that.redisOptions);
 
       redis_client.on("connect", function () {
           redis_client.rpush("frontend:"+this._name, this._containerID, 
@@ -256,7 +258,7 @@
 
       helpers.logDebug('_proxyStatus: Start...');
 
-      var redis_client = redis.createClient(this.redisPort, this.redisHostname, this.redisOptions);
+      var redis_client = redis.createClient(that.redisPort, that.redisHostname, that.redisOptions);
 
       redis_client.on("connect", function () {
 
