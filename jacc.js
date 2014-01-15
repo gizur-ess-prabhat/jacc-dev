@@ -44,7 +44,7 @@
         redisPort,
         redisOptions;
 
-    nconf.use('file', {file: './conf/jacc_config.json'});
+    nconf.use('file', {file: __dirname + '/conf/jacc_config.json'});
     nconf.load();
 
     var that = this;
